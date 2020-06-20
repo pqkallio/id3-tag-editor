@@ -1,6 +1,6 @@
 IDIR = ./src
 CC = gcc
-_DEPS = parser.h
+_DEPS = parser/parser.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 src = $(wildcard src/*.c) $(wildcard src/**/*.c)
@@ -16,10 +16,10 @@ CCFLAGS = -Wall -Wsign-compare -Wextra -Wpedantic -g -I$(IDIR)
 TESTFLAGS = -lcunit -I.
 LDFLAGS = -lncurses -lpanel
 
-src/*.o: src/*.c $(DEPS)
+src/%.o: src/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CCFLAGS) $(LDFLAGS)
 
-test/*.o: test/*.c $(DEPS)
+test/%.o: test/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CCFLAGS) $(TESTFLAGS) $(LDFLAGS)
 
 mp3-header-editor: $(obj) $(DEPS)
