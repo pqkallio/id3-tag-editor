@@ -1,2 +1,5 @@
 **/*.o
-**/*.swp
+**/*.sw*
+
+id3-tag-editor
+tester
