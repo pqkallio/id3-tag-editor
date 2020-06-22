@@ -3,6 +3,8 @@ CC = gcc
 _DEPS = parser/parser.h util/binary.h
 _TEST_DEPS = util_tests/binary_test.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+EXEC = id3-tag-editor
+TESTER = tester
 
 src = $(wildcard src/*.c) $(wildcard src/**/*.c)
 
@@ -23,7 +25,7 @@ src/%.o: src/%.c $(DEPS)
 test/%.o: test/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CCFLAGS) $(TESTFLAGS) $(LDFLAGS)
 
-id3-tag-editor: $(obj) $(DEPS)
+$(EXEC): $(obj) $(DEPS)
 	$(CC) -o $@ $^ $(CCFLAGS) $(LDFLAGS)
 
 tester: $(all_testo) $(DEPS)
@@ -31,4 +33,4 @@ tester: $(all_testo) $(DEPS)
 
 .PHONY: clean
 clean:
-	rm -f $(obj) $(testo) mp3-header-editor tester
+	rm -f $(obj) $(testo) $(EXEC) $(TESTER)

@@ -1,6 +1,7 @@
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
 #include "binary_test.h"
+#include "parser_test.h"
 
 CU_SuiteInfo create_test_suite(char* name, CU_TestInfo* tests)
 {
@@ -22,8 +23,14 @@ int main()
         CU_TEST_INFO_NULL,
     };
 
+    CU_TestInfo parser_tests[] = {
+        { "ID3 v2 tag", test_id3v2_parser },
+        CU_TEST_INFO_NULL,
+    };
+
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
+        create_test_suite("parser/parser.c", parser_tests),
         CU_SUITE_INFO_NULL,
     };
 
