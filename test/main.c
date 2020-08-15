@@ -20,6 +20,7 @@ int main()
 
     CU_TestInfo util_binary_tests[] = {
         { "remove_padding(char*, size_t, size_t)", test_remove_padding },
+        { "read_int(uint32_t*, FILE*, int, int)", test_read_int },
         CU_TEST_INFO_NULL,
     };
 

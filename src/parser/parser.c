@@ -70,12 +70,12 @@ void parse_v2_tag(ID3Tags* tags, FILE* mp3file)
     unsigned int i = 0;
 
     while (i < tag_size && !feof(mp3file)) {
-        char frame_id[] = {0, 0, 0, 0};
+        char frame_id[] = {0, 0, 0, 0, 0};
         uint32_t frame_size;
         char flags[] = {0, 0};
 
         fread(&frame_id, sizeof(char), 4, mp3file);
-        fread(&frame_size, sizeof(uint32_t), 1, mp3file);
+        read_big_endian_int(&frame_size, mp3file);
         fread(&flags, sizeof(char), 2, mp3file);
 
         if (feof(mp3file)) {
@@ -89,9 +89,10 @@ void parse_v2_tag(ID3Tags* tags, FILE* mp3file)
             char** base = (char**)tags;
 
             char** member_ptr = (char**)(base + *tag_offset);
-            *member_ptr = calloc(sizeof(char), frame_size);
+            char* str_ptr = (char*)calloc(sizeof(char), frame_size);
+            *member_ptr = str_ptr;
 
-            fread(*member_ptr, sizeof(char), frame_size - 1, mp3file);
+            fread(str_ptr, sizeof(char), frame_size - 1, mp3file);
 
             free(tag_offset);
         } else {
