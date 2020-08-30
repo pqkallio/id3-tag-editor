@@ -1,1 +1,7 @@
-**/*.swp
+**/*.o
+**/*.sw*
+
+id3-tag-editor
+tester
+
+.vscode
