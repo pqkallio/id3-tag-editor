@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+// TODO: Remove after tag-v2-struct is ready
 typedef struct _id3_tags {
     char* artist;
     char* title;
