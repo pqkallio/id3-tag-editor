@@ -51,8 +51,9 @@ void test_remove_from_linkedlist()
   char b[] = "b";
   char c[] = "c";
   char d[] = "d";
+  char e[] = "e";
 
-  TagV2Frame tfs[4] = {
+  TagV2Frame tfs[5] = {
     {.header.id = a},
     {.header.id = b},
     {.header.id = c},
@@ -65,12 +66,23 @@ void test_remove_from_linkedlist()
   ll->append(ll, &tfs[3]);
 
   CU_ASSERT_EQUAL(ll->size, 4);
-  CU_ASSERT_PTR_EQUAL(ll->first->next, &tfs[1]);
+  CU_ASSERT_PTR_EQUAL(ll->first->next->frame, &tfs[1]);
 
   ll->remove(ll, b);
 
   CU_ASSERT_EQUAL(ll->size, 3);
-  CU_ASSERT_PTR_EQUAL(ll->first->next, &tfs[2]);
+  CU_ASSERT_PTR_EQUAL(ll->first->next->frame, &tfs[2]);
+
+  ll->remove(ll, e);
+
+  CU_ASSERT_EQUAL(ll->size, 3);
+
+  ll->remove(ll, a);
+
+  CU_ASSERT_EQUAL(ll->size, 2);
+  CU_ASSERT_PTR_EQUAL(ll->first->frame, &tfs[2]);
+  CU_ASSERT_PTR_EQUAL(ll->first->next->frame, &tfs[3]);
+  CU_ASSERT_PTR_EQUAL(ll->last->frame, &tfs[3]);
 
   delete_linked_list(ll);
 }

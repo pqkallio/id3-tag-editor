@@ -11,6 +11,11 @@ LinkedListItem* new_linked_list_item(TagV2Frame* frame)
     return ll_item;
 }
 
+void delete_linked_list_item(LinkedListItem* item)
+{
+
+}
+
 void linked_list_append(LinkedList* list, TagV2Frame* frame)
 {
     LinkedListItem* ll_item = new_linked_list_item(frame);
@@ -30,9 +35,11 @@ void linked_list_append(LinkedList* list, TagV2Frame* frame)
     ll_item->prev = list->last;
     list->last->next = ll_item;
     list->last = ll_item;
+
+    ll_item = list->first;
 }
 
-void linked_list_remove(LinkedList* list, char* frame_id)
+void linked_list_remove(LinkedList* list, const char* frame_id)
 {
     LinkedListItem* ll_item = list->first;
 

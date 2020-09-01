@@ -3,6 +3,7 @@
 #include "binary_test.h"
 #include "parser_test.h"
 #include "linkedlist_test.h"
+#include "strings_test.h"
 
 CU_SuiteInfo create_test_suite(char* name, CU_TestInfo* tests)
 {
@@ -25,6 +26,11 @@ int main()
         CU_TEST_INFO_NULL,
     };
 
+    CU_TestInfo util_strings_tests[] = {
+        { "string_copy(char* str)", test_string_copy },
+        CU_TEST_INFO_NULL,
+    };
+
     CU_TestInfo parser_tests[] = {
         { "ID3 v2 tag", test_id3v2_parser },
         CU_TEST_INFO_NULL,
@@ -39,6 +45,7 @@ int main()
 
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
+        create_test_suite("util/strings.c", util_strings_tests),
         create_test_suite("parser/parser.c", parser_tests),
         create_test_suite("dstructs/linkedlist.c", linkedlist_tests),
         CU_SUITE_INFO_NULL,

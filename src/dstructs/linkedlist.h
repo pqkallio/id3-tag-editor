@@ -14,7 +14,7 @@ typedef struct _linked_list {
   struct _linked_list_item* first;
   struct _linked_list_item* last;
   void (*append)(struct _linked_list* list, TagV2Frame* frame);
-  void (*remove)(struct _linked_list* list, char* frame_id);
+  void (*remove)(struct _linked_list* list, const char* frame_id);
 } LinkedList;
 
 LinkedList* new_linked_list();
