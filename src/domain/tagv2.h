@@ -6,14 +6,14 @@
 #define ID3 "ID3"
 
 typedef struct _tag_v2_header {
-    unsigned char id[3];
+    char id[4];
     uint16_t version;
     unsigned char flags;
     uint32_t size;
 } TagV2Header;
 
 typedef struct _tag_v2_frame_header {
-    unsigned char id[4];
+    char* id;
     uint32_t size;
     uint16_t flags;
 } TagV2FrameHeader;
@@ -29,8 +29,8 @@ typedef struct _tag_v2 {
     TagV2Frame* first_frame;
     TagV2Frame* last_frame;
     void (*add_frame)(
-        TagV2* tag,
-        unsigned char id[4],
+        struct _tag_v2* tag,
+        char id[4],
         uint32_t size,
         uint16_t flags,
         char* body

@@ -1,6 +1,6 @@
 IDIR = ./src
 CC = gcc
-_DEPS = parser/parser.h util/binary.h
+_DEPS = parser/parser.h util/binary.h domain/tagv2.h dstructs/linkedlist.h
 _TEST_DEPS = util_tests/binary_test.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 EXEC = id3-tag-editor

@@ -2,6 +2,7 @@
 #include <CUnit/CUnit.h>
 #include "binary_test.h"
 #include "parser_test.h"
+#include "linkedlist_test.h"
 
 CU_SuiteInfo create_test_suite(char* name, CU_TestInfo* tests)
 {
@@ -29,9 +30,17 @@ int main()
         CU_TEST_INFO_NULL,
     };
 
+    CU_TestInfo linkedlist_tests[] = {
+        { "Empty list", test_empty_linkedlist },
+        { "Append to list", test_append_to_linkedlist },
+        { "Remove from list", test_remove_from_linkedlist},
+        CU_TEST_INFO_NULL
+    };
+
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
         create_test_suite("parser/parser.c", parser_tests),
+        create_test_suite("dstructs/linkedlist.c", linkedlist_tests),
         CU_SUITE_INFO_NULL,
     };
 

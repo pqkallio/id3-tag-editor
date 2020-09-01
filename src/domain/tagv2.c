@@ -2,11 +2,11 @@
 #include <string.h>
 #include "tagv2.h"
 
-void add_tag_v2_frame(TagV2* tag, unsigned char id[4], uint32_t size, uint16_t flags, char* body)
+void add_tag_v2_frame(TagV2* tag, char* id, uint32_t size, uint16_t flags, char* body)
 {
     TagV2Frame* new_frame = calloc(1, sizeof(TagV2Frame));
 
-    memcpy(new_frame->header.id, id, 4);
+    strcpy(new_frame->header.id, id);
 
     new_frame->header.size = size;
     new_frame->header.flags = flags;
