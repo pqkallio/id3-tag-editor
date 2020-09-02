@@ -13,15 +13,7 @@ void add_tag_v2_frame(TagV2* tag, const char* id, uint32_t size, uint16_t flags,
     new_frame->header.size = size;
     new_frame->header.flags = flags;
 
-    if (tag->first_frame == NULL) {
-        tag->first_frame = new_frame;
-    }
-
-    if (tag->last_frame != NULL) {
-        tag->last_frame->next = new_frame;
-    }
-
-    tag->last_frame = new_frame;
+    set(tag->frames, id, new_frame);
 }
 
 TagV2* new_tag_v2(uint16_t version, unsigned char flags, uint32_t size)
@@ -34,29 +26,29 @@ TagV2* new_tag_v2(uint16_t version, unsigned char flags, uint32_t size)
     tag->header.flags = flags;
     tag->header.size = size;
 
+    tag->frames = calloc(1, sizeof(HashMap));
+
     return tag;
 }
 
 TagV2Frame* delete_tag_v2_frame(TagV2Frame* frame)
 {
-    TagV2Frame* next = frame->next;
-
     if (frame->body != NULL) {
         free(frame->body);
     }
 
     free(frame);
 
-    return next;
+    return NULL;
 }
 
 void delete_tag_v2(TagV2* tag)
 {
-    TagV2Frame* frame = tag->first_frame;
-
-    while (frame != NULL) {
-        frame = delete_tag_v2_frame(frame);
+    if (!tag) {
+        return;
     }
+
+    delete_hashmap(tag->frames);
 
     free(tag);
 }

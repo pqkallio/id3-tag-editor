@@ -2,6 +2,7 @@
 #define _ID3_TAG_EDITOR_DOMAIN_TAGV2_H
 
 #include <stdint.h>
+#include "../dstructs/hashmap.h"
 
 #define ID3 "ID3"
 
@@ -21,13 +22,11 @@ typedef struct _tag_v2_frame_header {
 typedef struct _tag_v2_frame {
     TagV2FrameHeader header;
     char* body;
-    struct _tag_v2_frame* next;
 } TagV2Frame;
 
 typedef struct _tag_v2 {
     TagV2Header header;
-    TagV2Frame* first_frame;
-    TagV2Frame* last_frame;
+    HashMap* frames;
 } TagV2;
 
 TagV2* new_tag_v2(uint16_t version, unsigned char flags, uint32_t size);

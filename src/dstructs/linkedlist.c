@@ -13,11 +13,17 @@ LinkedListItem* new_linked_list_item(TagV2Frame* frame)
 
 void delete_linked_list_item(LinkedListItem* item)
 {
-
+    free(item->frame->body);
+    free(item->frame->header.id);
+    free(item);
 }
 
 void linked_list_append(LinkedList* list, TagV2Frame* frame)
 {
+    if (!list) {
+        return;
+    }
+
     LinkedListItem* ll_item = new_linked_list_item(frame);
 
     list->size++;
@@ -39,8 +45,12 @@ void linked_list_append(LinkedList* list, TagV2Frame* frame)
     ll_item = list->first;
 }
 
-void linked_list_remove(LinkedList* list, const char* frame_id)
+unsigned int linked_list_remove(LinkedList* list, const char* frame_id)
 {
+    if (!list) {
+        return 0;
+    }
+
     LinkedListItem* ll_item = list->first;
 
     while (ll_item != NULL) {
@@ -61,10 +71,12 @@ void linked_list_remove(LinkedList* list, const char* frame_id)
             list->last = ll_item->prev;
         }
 
-        free(ll_item);
+        delete_linked_list_item(ll_item);
 
-        break;
+        return 1;
     }
+
+    return 0;
 }
 
 LinkedList* new_linked_list()
@@ -79,6 +91,10 @@ LinkedList* new_linked_list()
 
 void delete_linked_list(LinkedList* list)
 {
+    if (!list) {
+        return;
+    }
+
     LinkedListItem* ll_item = list->first;
     LinkedListItem* next = NULL;
 
