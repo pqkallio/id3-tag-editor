@@ -1,6 +1,6 @@
 #include <malloc.h>
 #include <string.h>
-#include "hashmap.h";
+#include "hashmap.h"
 
 /* djb2 * This algorithm was first reported by Dan Bernstein many years ago in comp.lang.c */
 unsigned long hash(const char *str)
@@ -9,20 +9,20 @@ unsigned long hash(const char *str)
 
     int c;
 
-    while (c = *str++) {
+    while ((c = *str++)) {
         hash = ((hash << 5) + hash) + c;
     }
 
     return hash;
 }
 
-TagV2Frame* get(const HashMap* map, const char* item)
+const void* get(const HashMap* map, const char* key)
 {
-    if (!map || !item) {
+    if (!map || !key) {
         return NULL;
     }
 
-    unsigned long item_hash = hash(item) % map->n_slots;
+    unsigned long item_hash = hash(key) % map->n_slots;
 
     LinkedList* list = map->map[item_hash];
 
@@ -33,8 +33,8 @@ TagV2Frame* get(const HashMap* map, const char* item)
     LinkedListItem* ll_item = list->first;
 
     while (ll_item) {
-        if (ll_item->frame && !strcmp(item, ll_item->frame->header.id)) {
-            return ll_item->frame;
+        if (ll_item->item && !strcmp(key, ll_item->key)) {
+            return ll_item->item;
         }
 
         ll_item = ll_item->next;
@@ -43,7 +43,7 @@ TagV2Frame* get(const HashMap* map, const char* item)
     return NULL;
 }
 
-void set(HashMap* map, const char* key, const TagV2Frame* value)
+void set(HashMap* map, const char* key, const void* value)
 {
     if (!map || !key || !value) {
         return;
@@ -58,15 +58,12 @@ void set(HashMap* map, const char* key, const TagV2Frame* value)
         ll = map->map[hash_key];
     }
 
-    TagV2Frame* copy = calloc(1, sizeof(TagV2Frame));
-    memcpy(copy, value, sizeof(TagV2Frame));
-
-    ll->append(ll, copy);
+    ll->append(ll, key, value);
 
     map->size++;
 }
 
-void remove(HashMap* map, const char* key)
+void hashmap_remove(HashMap* map, const char* key)
 {
     if (!map || !key) {
         return;

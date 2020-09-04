@@ -1,10 +1,9 @@
 #ifndef _DSTRUCTS_LINKEDLIST_H
 #define _DSTRUCTS_LINKEDLIST_H
 
-#include "./domain/tagv2.h"
-
 typedef struct _linked_list_item {
-  TagV2Frame* frame;
+  char* key;
+  const void* item;
   struct _linked_list_item* prev;
   struct _linked_list_item* next;
 } LinkedListItem;
@@ -13,8 +12,8 @@ typedef struct _linked_list {
   unsigned long size;
   struct _linked_list_item* first;
   struct _linked_list_item* last;
-  void (*append)(struct _linked_list* list, TagV2Frame* frame);
-  unsigned int (*remove)(struct _linked_list* list, const char* frame_id);
+  void (*append)(struct _linked_list* list, const char* key, const void* item);
+  unsigned int (*remove)(struct _linked_list* list, const char* key);
 } LinkedList;
 
 LinkedList* new_linked_list();

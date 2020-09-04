@@ -1,30 +1,34 @@
 #include <malloc.h>
 #include <string.h>
 #include "linkedlist.h"
+#include "../util/strings.h"
 
-LinkedListItem* new_linked_list_item(TagV2Frame* frame)
+LinkedListItem* new_linked_list_item(const char* key, const void* item)
 {
     LinkedListItem* ll_item = calloc(1, sizeof(LinkedListItem));
+    char* item_key = string_copy(key);
 
-    ll_item->frame = frame;
+    ll_item->item = item;
+    ll_item->key = item_key;
 
     return ll_item;
 }
 
 void delete_linked_list_item(LinkedListItem* item)
 {
-    free(item->frame->body);
-    free(item->frame->header.id);
+    if (!item) return;
+
+    free(item->key);
     free(item);
 }
 
-void linked_list_append(LinkedList* list, TagV2Frame* frame)
+void linked_list_append(LinkedList* list, const char* key, const void* item)
 {
     if (!list) {
         return;
     }
 
-    LinkedListItem* ll_item = new_linked_list_item(frame);
+    LinkedListItem* ll_item = new_linked_list_item(key, item);
 
     list->size++;
 
@@ -45,7 +49,7 @@ void linked_list_append(LinkedList* list, TagV2Frame* frame)
     ll_item = list->first;
 }
 
-unsigned int linked_list_remove(LinkedList* list, const char* frame_id)
+unsigned int linked_list_remove(LinkedList* list, const char* key)
 {
     if (!list) {
         return 0;
@@ -54,7 +58,7 @@ unsigned int linked_list_remove(LinkedList* list, const char* frame_id)
     LinkedListItem* ll_item = list->first;
 
     while (ll_item != NULL) {
-        if (strcmp(ll_item->frame->header.id, frame_id)) {
+        if (strcmp(ll_item->key, key)) {
             ll_item = ll_item->next;
             continue;
         }
