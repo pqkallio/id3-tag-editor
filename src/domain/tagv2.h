@@ -16,7 +16,7 @@ typedef struct _tag_v2_header {
 typedef struct _tag_v2_frame_header {
     const char* id;
     uint32_t size;
-    uint16_t flags;
+    char flags[2];
 } TagV2FrameHeader;
 
 typedef struct _tag_v2_frame {
@@ -32,6 +32,6 @@ typedef struct _tag_v2 {
 TagV2* new_tag_v2(uint16_t version, unsigned char flags, uint32_t size);
 void delete_tag_v2(TagV2* tag);
 
-void add_tag_v2_frame(TagV2* tag, const char* id, uint32_t size, uint16_t flags, const char* body);
+void add_tag_v2_frame(TagV2* tag, const char* id, uint32_t size, char flags[2], const char* body);
 
 #endif /* _ID3_TAG_EDITOR_DOMAIN_TAGV2_H */

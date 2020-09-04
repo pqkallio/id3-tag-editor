@@ -4,35 +4,6 @@
 #include "parser.h"
 #include "util/binary.h"
 
-typedef struct _frame_target {
-    char* frame_id;
-    size_t tag_offset;
-} FrameTarget;
-
-const FrameTarget frame_targets[] = {
-    {.frame_id = "TALB", .tag_offset = offsetof(struct _id3_tags, album)},
-    {.frame_id = "TPE1", .tag_offset = offsetof(struct _id3_tags, artist)},
-    {.frame_id = "TIT2", .tag_offset = offsetof(struct _id3_tags, title)},
-    {.frame_id = "TRCK", .tag_offset = offsetof(struct _id3_tags, track)},
-};
-
-size_t* get_tag_offset(char* label)
-{
-    size_t* offset = NULL;
-
-    for (unsigned int i = 0; i < 4; i++) {
-        if (!memcmp(label, frame_targets[i].frame_id, 4)) {
-            offset = malloc(sizeof(size_t));
-
-            *offset = frame_targets[i].tag_offset;
-
-            break;
-        }
-    }
-
-    return offset;
-}
-
 int has_v2_tag(FILE* mp3file)
 {
     if (mp3file == NULL) {
@@ -92,10 +63,10 @@ int has_v2_tag(FILE* mp3file)
  * VII   A zero byte is always included, but should be ignored.
  * VIII  Because of the zero byte (see VII), the content's length is size-1 bytes. It is a non-null-terminated string.
  */
-void parse_v2_tag(ID3Tags* tags, FILE* mp3file)
+TagV2* parse_v2_tag(FILE* mp3file)
 {
-    uint16_t version; // ignore for now
-    unsigned char flags; // ignore for now
+    uint16_t version;
+    unsigned char flags;
     char _tag_size[] = {0, 0, 0, 0};
 
     fread(&version, sizeof(uint16_t), 1, mp3file);
@@ -103,14 +74,17 @@ void parse_v2_tag(ID3Tags* tags, FILE* mp3file)
     fread(&_tag_size, sizeof(char), 4, mp3file);
 
     if (feof(mp3file)) {
-        return;
+        return NULL;
     }
 
     // For the tag size, each byte has 7 bits that count, so we drop the first bit from each byte, squueze the rest
     // together and interpret that as the tag size.
-    unsigned int tag_size = remove_padding(_tag_size, 4, 7);
+    uint32_t tag_size = remove_padding(_tag_size, 4, 7);
+
+    TagV2* tagV2 = new_tag_v2(version, flags, tag_size);
 
     unsigned int i = 0;
+    char* body = NULL;
 
     // Let's start reading frames.
     while (i < tag_size && !feof(mp3file)) {
@@ -122,45 +96,38 @@ void parse_v2_tag(ID3Tags* tags, FILE* mp3file)
         read_big_endian_int(&frame_size, mp3file);
         fread(&flags, sizeof(char), 2, mp3file);
 
+        if (frame_size < 1) {
+            break;
+        }
+
         // If something bad happens...
         if (feof(mp3file)) {
-            return;
+            return tagV2;
         }
 
         i += frame_size + 10; // frame size + header size
 
-        size_t* tag_offset = get_tag_offset(frame_id);
-
-        if (tag_offset == NULL) {
-            // move along if this is not to be parsed
-            fseek(mp3file, frame_size, SEEK_CUR);
-            continue;
-        }
+        body = realloc(body, frame_size * sizeof(char));
+        body[frame_size - 1] = 0;
 
         fseek(mp3file, 1, SEEK_CUR); // skip the zero byte
+        fread(body, sizeof(char), frame_size - 1, mp3file); // read the string from file
 
-        // calculate the address of the member that the string is to be pointed from and allocate size for it
-        char** base = (char**)tags;
-        char** member_ptr = (char**)(base + (*tag_offset / 8));
-        *member_ptr = (char*)calloc(sizeof(char), frame_size);
-
-        fread(*member_ptr, sizeof(char), frame_size - 1, mp3file); // read the string from file
-
-        free(tag_offset);
+        add_tag_v2_frame(tagV2, frame_id, frame_size, flags, body);
     }
+
+    return tagV2;
 }
 
-ID3Tags* parseMP3(FILE* mp3file)
+TagV2* parseMP3(FILE* mp3file)
 {
     if (mp3file == NULL) {
         return NULL;
     }
 
-    ID3Tags* tags = calloc(sizeof(ID3Tags), 1);
-
     if (has_v2_tag(mp3file)) {
-        parse_v2_tag(tags, mp3file);
+        return parse_v2_tag(mp3file);
     }
 
-    return tags;
+    return NULL;
 }
