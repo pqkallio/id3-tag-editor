@@ -63,9 +63,15 @@ unsigned int linked_list_remove(LinkedList* list, const char* key)
             continue;
         }
 
-        ll_item->prev->next = ll_item->next;
-        ll_item->next->prev = ll_item->prev;
         list->size--;
+
+        if (ll_item->prev) {
+            ll_item->prev->next = ll_item->next;
+        }
+
+        if (ll_item->next) {
+            ll_item->next->prev = ll_item->prev;
+        }
 
         if (ll_item == list->first) {
             list->first = ll_item->next;
@@ -105,7 +111,7 @@ void delete_linked_list(LinkedList* list)
     while (ll_item != NULL)
     {
         next = ll_item->next;
-        free(ll_item);
+        delete_linked_list_item(ll_item);
         ll_item = next;
     }
 
