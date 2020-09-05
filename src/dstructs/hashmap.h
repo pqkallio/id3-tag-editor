@@ -17,5 +17,6 @@ void delete_hashmap(HashMap* map);
 const void* hashmap_get(const HashMap* map, const char* key);
 void hashmap_set(HashMap* map, const char* key, const void* value);
 void hashmap_remove(HashMap* map, const char* key);
+void hashmap_foreach(HashMap* map, void (*callback)(void* item));
 
 #endif /* _DSTRUCTS_HASHMAP_H */

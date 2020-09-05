@@ -40,15 +40,19 @@ TagV2* new_tag_v2(uint16_t version, unsigned char flags, uint32_t size)
     return tag;
 }
 
-TagV2Frame* delete_tag_v2_frame(TagV2Frame* frame)
+void delete_tag_v2_frame(TagV2Frame* frame)
 {
+    if (frame == NULL) return;
+
     if (frame->body != NULL) {
         free(frame->body);
     }
 
-    free(frame);
+    if (frame->header.id != NULL) {
+        free(frame->header.id);
+    }
 
-    return NULL;
+    free(frame);
 }
 
 void delete_tag_v2(TagV2* tag)

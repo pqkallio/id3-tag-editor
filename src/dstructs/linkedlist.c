@@ -3,7 +3,7 @@
 #include "linkedlist.h"
 #include "../util/strings.h"
 
-LinkedListItem* new_linked_list_item(const char* key, const void* item)
+LinkedListItem* new_linked_list_item(const char* key, void* item)
 {
     LinkedListItem* ll_item = calloc(1, sizeof(LinkedListItem));
     char* item_key = string_copy(key);
@@ -19,10 +19,11 @@ void delete_linked_list_item(LinkedListItem* item)
     if (!item) return;
 
     free(item->key);
+    free(item->item);
     free(item);
 }
 
-void linked_list_append(LinkedList* list, const char* key, const void* item)
+void linked_list_append(LinkedList* list, const char* key, void* item)
 {
     if (!list) {
         return;

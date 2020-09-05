@@ -419,7 +419,7 @@ void test_id3v2_parser()
   const TagV2Frame* frame = get_tag_v2_frame(actual, "TALB");
   CU_ASSERT_PTR_NOT_NULL_FATAL(frame);
 
-  TagV2FrameHeader* header = &frame->header;
+  const TagV2FrameHeader* header = &frame->header;
   CU_ASSERT_STRING_EQUAL(frame->body, "CD 1");
   CU_ASSERT_EQUAL(header->size, 5);
   CU_ASSERT_EQUAL(header->has_zero_byte, 1);
@@ -476,5 +476,5 @@ void test_id3v2_parser()
 
   CU_ASSERT_TRUE(1);
 
-  free(actual);
+  delete_tag_v2(actual);
 }

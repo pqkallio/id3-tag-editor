@@ -109,8 +109,7 @@ TagV2* parse_v2_tag(FILE* mp3file)
 
         i += frame_size + 10; // frame size + header size
 
-        body = realloc(body, frame_size * sizeof(char));
-        body[frame_size - 1] = 0;
+        body = calloc(frame_size, sizeof(char));
 
         fread(&zero_byte, sizeof(char), 1, mp3file);
 
@@ -122,7 +121,8 @@ TagV2* parse_v2_tag(FILE* mp3file)
         fread(body, sizeof(char), has_zero_byte ? frame_size - 1 : frame_size, mp3file); // read the string from file
 
         add_tag_v2_frame(tagV2, frame_id, frame_size, flags, body, has_zero_byte);
-        printf("%s (%d): %s\n", frame_id, frame_size, body);
+
+        if (body != NULL) free(body);
     }
 
     return tagV2;

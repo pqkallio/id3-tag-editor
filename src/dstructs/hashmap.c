@@ -112,3 +112,20 @@ void delete_hashmap(HashMap* map)
 
     free(map);
 }
+
+void hashmap_foreach(HashMap* map, void (*callback)(void* item))
+{
+    for (unsigned int i = 0; i < map->n_slots; i++) {
+        LinkedList* ll = map->map[i];
+
+        if (ll == NULL) continue;
+
+        LinkedListItem* ll_item = ll->first;
+
+        while (ll_item) {
+            callback(ll_item->item);
+
+            ll_item = ll_item->next;
+        }
+    }
+}

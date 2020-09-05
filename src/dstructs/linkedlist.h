@@ -3,7 +3,7 @@
 
 typedef struct _linked_list_item {
   char* key;
-  const void* item;
+  void* item;
   struct _linked_list_item* prev;
   struct _linked_list_item* next;
 } LinkedListItem;
@@ -12,7 +12,7 @@ typedef struct _linked_list {
   unsigned long size;
   struct _linked_list_item* first;
   struct _linked_list_item* last;
-  void (*append)(struct _linked_list* list, const char* key, const void* item);
+  void (*append)(struct _linked_list* list, const char* key, void* item);
   unsigned int (*remove)(struct _linked_list* list, const char* key);
 } LinkedList;
 
