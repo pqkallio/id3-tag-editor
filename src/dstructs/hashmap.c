@@ -69,7 +69,7 @@ void hashmap_remove(HashMap* map, const char* key)
         return;
     }
 
-    unsigned long hash_key = hash(key);
+    unsigned long hash_key = hash(key) % map->n_slots;
 
     LinkedList* ll = map->map[hash_key];
 
@@ -80,15 +80,21 @@ void hashmap_remove(HashMap* map, const char* key)
     if (ll->remove(ll, key)) map->size--;
 }
 
-HashMap* new_hashmap()
+HashMap* new_hashmap_with_size(unsigned long size)
 {
     HashMap* map = calloc(1, sizeof(HashMap));
 
-    map->n_slots = 100;
+    map->n_slots = size;
     map->map = calloc(map->n_slots, sizeof(LinkedList*));
 
     return map;
 }
+
+HashMap* new_hashmap()
+{
+    return new_hashmap_with_size(100);
+}
+
 
 void delete_hashmap(HashMap* map)
 {

@@ -11,6 +11,7 @@ typedef struct _hashmap {
 } HashMap;
 
 HashMap* new_hashmap();
+HashMap* new_hashmap_with_size(unsigned long size);
 void delete_hashmap(HashMap* map);
 
 const void* get(const HashMap* map, const char* key);

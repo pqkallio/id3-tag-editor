@@ -3,6 +3,7 @@
 #include "binary_test.h"
 #include "parser_test.h"
 #include "linkedlist_test.h"
+#include "hashmap_test.h"
 #include "strings_test.h"
 
 CU_SuiteInfo create_test_suite(char* name, CU_TestInfo* tests)
@@ -43,11 +44,18 @@ int main()
         CU_TEST_INFO_NULL
     };
 
+    CU_TestInfo hashmap_tests[] = {
+        { "HashMap with default size", test_hashmap },
+        { "HashMap with size 42", test_hashmap_with_size },
+        CU_TEST_INFO_NULL
+    };
+
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
         create_test_suite("util/strings.c", util_strings_tests),
         create_test_suite("parser/parser.c", parser_tests),
         create_test_suite("dstructs/linkedlist.c", linkedlist_tests),
+        create_test_suite("dstructs/hashmap.c", hashmap_tests),
         CU_SUITE_INFO_NULL,
     };
 
