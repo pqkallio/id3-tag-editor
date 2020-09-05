@@ -16,7 +16,7 @@ unsigned long hash(const char *str)
     return hash;
 }
 
-const void* get(const HashMap* map, const char* key)
+const void* hashmap_get(const HashMap* map, const char* key)
 {
     if (!map || !key) {
         return NULL;
@@ -43,7 +43,7 @@ const void* get(const HashMap* map, const char* key)
     return NULL;
 }
 
-void set(HashMap* map, const char* key, const void* value)
+void hashmap_set(HashMap* map, const char* key, const void* value)
 {
     if (!map || !key || !value) {
         return;

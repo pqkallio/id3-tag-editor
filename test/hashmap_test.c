@@ -8,30 +8,30 @@ void test_get_set_and_remove(HashMap* map)
     char* b = "b";
     char* c = "c";
 
-    set(map, a, a);
+    hashmap_set(map, a, a);
 
     CU_ASSERT_EQUAL(map->size, 1);
-    const void* x = get(map, a);
+    const void* x = hashmap_get(map, a);
 
     CU_ASSERT_PTR_EQUAL(x, a);
 
-    set(map, b, b);
+    hashmap_set(map, b, b);
 
     CU_ASSERT_EQUAL(map->size, 2);
-    x = get(map, a);
+    x = hashmap_get(map, a);
     CU_ASSERT_PTR_EQUAL(x, a);
-    x = get(map, b);
+    x = hashmap_get(map, b);
     CU_ASSERT_PTR_EQUAL(x, b);
 
-    x = get(map, c);
+    x = hashmap_get(map, c);
     CU_ASSERT_PTR_NULL(x);
 
     hashmap_remove(map, a);
 
     CU_ASSERT_EQUAL(map->size, 1);
-    x = get(map, a);
+    x = hashmap_get(map, a);
     CU_ASSERT_PTR_NULL(x);
-    x = get(map, b);
+    x = hashmap_get(map, b);
     CU_ASSERT_PTR_EQUAL(x, b);
 }
 

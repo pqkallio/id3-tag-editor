@@ -14,8 +14,8 @@ HashMap* new_hashmap();
 HashMap* new_hashmap_with_size(unsigned long size);
 void delete_hashmap(HashMap* map);
 
-const void* get(const HashMap* map, const char* key);
-void set(HashMap* map, const char* key, const void* value);
+const void* hashmap_get(const HashMap* map, const char* key);
+void hashmap_set(HashMap* map, const char* key, const void* value);
 void hashmap_remove(HashMap* map, const char* key);
 
 #endif /* _DSTRUCTS_HASHMAP_H */

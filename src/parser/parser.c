@@ -60,7 +60,7 @@ int has_v2_tag(FILE* mp3file)
  *       i: Compression
  *       j: Encryption
  *       k: Grouping identity
- * VII   A zero byte is always included, but should be ignored.
+ * VII   A zero byte is SOMETIMES included, and should be ignored.
  * VIII  Because of the zero byte (see VII), the content's length is size-1 bytes. It is a non-null-terminated string.
  */
 TagV2* parse_v2_tag(FILE* mp3file)
@@ -85,12 +85,14 @@ TagV2* parse_v2_tag(FILE* mp3file)
 
     unsigned int i = 0;
     char* body = NULL;
+    char zero_byte = 'x';
 
     // Let's start reading frames.
     while (i < tag_size && !feof(mp3file)) {
         char frame_id[] = {0, 0, 0, 0, 0};
         uint32_t frame_size;
         char flags[] = {0, 0};
+        unsigned char has_zero_byte = 1;
 
         fread(&frame_id, sizeof(char), 4, mp3file);
         read_big_endian_int(&frame_size, mp3file);
@@ -110,10 +112,17 @@ TagV2* parse_v2_tag(FILE* mp3file)
         body = realloc(body, frame_size * sizeof(char));
         body[frame_size - 1] = 0;
 
-        fseek(mp3file, 1, SEEK_CUR); // skip the zero byte
-        fread(body, sizeof(char), frame_size - 1, mp3file); // read the string from file
+        fread(&zero_byte, sizeof(char), 1, mp3file);
 
-        add_tag_v2_frame(tagV2, frame_id, frame_size, flags, body);
+        if (zero_byte != 0) {
+            fseek(mp3file, -1, SEEK_CUR);
+            has_zero_byte = 0;
+        }
+
+        fread(body, sizeof(char), has_zero_byte ? frame_size - 1 : frame_size, mp3file); // read the string from file
+
+        add_tag_v2_frame(tagV2, frame_id, frame_size, flags, body, has_zero_byte);
+        printf("%s (%d): %s\n", frame_id, frame_size, body);
     }
 
     return tagV2;

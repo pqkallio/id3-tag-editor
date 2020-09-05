@@ -3,7 +3,14 @@
 #include "tagv2.h"
 #include "../util/strings.h"
 
-void add_tag_v2_frame(TagV2* tag, const char* id, uint32_t size, char flags[2], const char* body)
+void add_tag_v2_frame(
+    TagV2* tag,
+    const char* id,
+    uint32_t size,
+    char flags[2],
+    const char* body,
+    unsigned char has_zero_byte
+)
 {
     TagV2Frame* new_frame = calloc(1, sizeof(TagV2Frame));
 
@@ -13,8 +20,9 @@ void add_tag_v2_frame(TagV2* tag, const char* id, uint32_t size, char flags[2], 
     new_frame->header.size = size;
     new_frame->header.flags[0] = flags[0];
     new_frame->header.flags[1] = flags[1];
+    new_frame->header.has_zero_byte = has_zero_byte;
 
-    set(tag->frames, id, new_frame);
+    hashmap_set(tag->frames, id, new_frame);
 }
 
 TagV2* new_tag_v2(uint16_t version, unsigned char flags, uint32_t size)
@@ -52,4 +60,13 @@ void delete_tag_v2(TagV2* tag)
     delete_hashmap(tag->frames);
 
     free(tag);
+}
+
+const TagV2Frame* get_tag_v2_frame(const TagV2* tagV2, const char* frame_id)
+{
+    if (!tagV2 || !tagV2->frames) {
+        return NULL;
+    }
+
+    return hashmap_get(tagV2->frames, frame_id);
 }
