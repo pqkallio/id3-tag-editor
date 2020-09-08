@@ -3,6 +3,7 @@
 #include "binary_test.h"
 #include "parser_test.h"
 #include "linkedlist_test.h"
+#include "stack_test.h"
 #include "hashmap_test.h"
 #include "strings_test.h"
 
@@ -50,10 +51,16 @@ int main()
         CU_TEST_INFO_NULL
     };
 
+    CU_TestInfo stack_tests[] = {
+        { "Stack test", test_stack },
+        CU_TEST_INFO_NULL
+    };
+
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
         create_test_suite("util/strings.c", util_strings_tests),
         create_test_suite("parser/parser.c", parser_tests),
+        create_test_suite("dstructs/stack.c", stack_tests),
         create_test_suite("dstructs/linkedlist.c", linkedlist_tests),
         create_test_suite("dstructs/hashmap.c", hashmap_tests),
         CU_SUITE_INFO_NULL,
