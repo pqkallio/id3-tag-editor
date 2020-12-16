@@ -1,7 +1,11 @@
 **/*.o
 **/*.sw*
+**/*.gcda
+**/*.gcno
 
 id3-tag-editor
 tester
 
 .vscode
+
+coverage
