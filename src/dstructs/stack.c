@@ -60,7 +60,7 @@ void *pop_stack(Stack *stack)
 
     if (stack->idx == 0)
     {
-        return &STACK_BOTTOM_;
+        return (void *)-1;
     }
 
     void *item = stack->stack[stack->idx];

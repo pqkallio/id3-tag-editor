@@ -1,10 +1,11 @@
 #include <CUnit/CUnit.h>
+#include <malloc.h>
 #include "stack_test.h"
 #include "src/dstructs/stack.h"
 
 void test_stack()
 {
-    Stack* stack = new_stack(2);
+    Stack *stack = new_stack(2);
 
     CU_ASSERT_PTR_NOT_NULL_FATAL(stack);
     CU_ASSERT_EQUAL_FATAL(stack->idx, 0);
@@ -12,7 +13,8 @@ void test_stack()
 
     int baba[3];
 
-    CU_ASSERT_PTR_NULL_FATAL(pop_stack(stack));
+    void *popped = pop_stack(stack);
+    CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), (void *)-1);
 
     CU_ASSERT_EQUAL_FATAL(push_to_stack(stack, &baba[0]), 1);
     CU_ASSERT_EQUAL_FATAL(push_to_stack(stack, &baba[1]), 1);
@@ -22,8 +24,8 @@ void test_stack()
     CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), &baba[1]);
     CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), &baba[0]);
 
-    CU_ASSERT_PTR_NULL_FATAL(pop_stack(stack));
-    CU_ASSERT_PTR_NULL_FATAL(peek_stack(stack));
+    CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), (void *)-1);
+    CU_ASSERT_PTR_EQUAL_FATAL(peek_stack(stack), (void *)-1);
 
     push_to_stack(stack, &baba[0]);
     push_to_stack(stack, &baba[1]);
@@ -33,4 +35,19 @@ void test_stack()
     CU_ASSERT_EQUAL_FATAL(stack->idx, 0);
 
     delete_stack(stack);
+
+    stack = NULL;
+
+    clear_stack(stack);
+    delete_stack(stack);
+
+    CU_ASSERT_PTR_NULL(pop_stack(stack));
+    CU_ASSERT_PTR_NULL(peek_stack(stack));
+
+    stack = calloc(1, sizeof(Stack));
+
+    CU_ASSERT_PTR_NULL(pop_stack(stack));
+    CU_ASSERT_PTR_NULL(peek_stack(stack));
+
+    free(stack);
 }
