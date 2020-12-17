@@ -100,3 +100,15 @@ void test_remove_from_linkedlist()
 
     delete_linked_list(ll);
 }
+
+void test_linkedlist_is_null()
+{
+    LinkedList *ll = new_linked_list();
+    void *item = (void *)-1;
+
+    ll->append(NULL, "key", item);
+
+    CU_ASSERT_EQUAL(ll->remove(NULL, "key"), 0);
+
+    delete_linked_list(NULL);
+}

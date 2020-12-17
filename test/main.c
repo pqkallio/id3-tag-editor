@@ -7,9 +7,9 @@
 #include "hashmap_test.h"
 #include "strings_test.h"
 
-CU_SuiteInfo create_test_suite(char* name, CU_TestInfo* tests)
+CU_SuiteInfo create_test_suite(char *name, CU_TestInfo *tests)
 {
-    CU_SuiteInfo info = { name, NULL, NULL, NULL, NULL, tests };
+    CU_SuiteInfo info = {name, NULL, NULL, NULL, NULL, tests};
 
     return info;
 }
@@ -18,43 +18,43 @@ int main()
 {
     CU_ErrorCode err = CU_initialize_registry();
 
-    if (err != CUE_SUCCESS) {
+    if (err != CUE_SUCCESS)
+    {
         return err;
     }
 
     CU_TestInfo util_binary_tests[] = {
-        { "remove_padding(char*, size_t, size_t)", test_remove_padding },
-        { "read_int(uint32_t*, FILE*, int, int)", test_read_int },
+        {"remove_padding(char*, size_t, size_t)", test_remove_padding},
+        {"read_int(uint32_t*, FILE*, int, int)", test_read_int},
         CU_TEST_INFO_NULL,
     };
 
     CU_TestInfo util_strings_tests[] = {
-        { "string_copy(char* str)", test_string_copy },
+        {"string_copy(char* str)", test_string_copy},
         CU_TEST_INFO_NULL,
     };
 
     CU_TestInfo parser_tests[] = {
-        { "ID3 v2 tag", test_id3v2_parser },
+        {"ID3 v2 tag", test_id3v2_parser},
         CU_TEST_INFO_NULL,
     };
 
     CU_TestInfo linkedlist_tests[] = {
-        { "Empty list", test_empty_linkedlist },
-        { "Append to list", test_append_to_linkedlist },
-        { "Remove from list", test_remove_from_linkedlist},
-        CU_TEST_INFO_NULL
-    };
+        {"Empty list", test_empty_linkedlist},
+        {"Append to list", test_append_to_linkedlist},
+        {"Remove from list", test_remove_from_linkedlist},
+        {"Delete a null list", test_linkedlist_is_null},
+        CU_TEST_INFO_NULL};
 
     CU_TestInfo hashmap_tests[] = {
-        { "HashMap with default size", test_hashmap },
-        { "HashMap with size 42", test_hashmap_with_size },
-        CU_TEST_INFO_NULL
-    };
+        {"HashMap with default size", test_hashmap},
+        {"HashMap with size 42", test_hashmap_with_size},
+        {"HashMap tests with null pointers", test_hashmap_funcs_with_null_pointers},
+        CU_TEST_INFO_NULL};
 
     CU_TestInfo stack_tests[] = {
-        { "Stack test", test_stack },
-        CU_TEST_INFO_NULL
-    };
+        {"Stack test", test_stack},
+        CU_TEST_INFO_NULL};
 
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
@@ -68,7 +68,8 @@ int main()
 
     err = CU_register_suites(suites);
 
-    if (err != CUE_SUCCESS) {
+    if (err != CUE_SUCCESS)
+    {
         CU_cleanup_registry();
         return err;
     }

@@ -3,5 +3,6 @@
 
 void test_hashmap();
 void test_hashmap_with_size();
+void test_hashmap_funcs_with_null_pointers();
 
 #endif /* _ID3_HEADER_EDITOR_DSTRUCTS_HASHMAP_TEST_H */
