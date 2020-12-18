@@ -6,6 +6,7 @@
 #include "stack_test.h"
 #include "hashmap_test.h"
 #include "strings_test.h"
+#include "mem_test.h"
 
 CU_SuiteInfo create_test_suite(char *name, CU_TestInfo *tests)
 {
@@ -57,6 +58,10 @@ int main()
         {"Stack test", test_stack},
         CU_TEST_INFO_NULL};
 
+    CU_TestInfo mem_tests[] = {
+        {"MemMap allocation test", test_memmap_allocate},
+        {"MemMap block allocation test", test_block_allocation}};
+
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
         create_test_suite("util/strings.c", util_strings_tests),
@@ -64,6 +69,7 @@ int main()
         create_test_suite("dstructs/stack.c", stack_tests),
         create_test_suite("dstructs/linkedlist.c", linkedlist_tests),
         create_test_suite("dstructs/hashmap.c", hashmap_tests),
+        create_test_suite("mem/mem.c", mem_tests),
         CU_SUITE_INFO_NULL,
     };
 

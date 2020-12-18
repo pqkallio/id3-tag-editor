@@ -42,6 +42,7 @@ void test_append_to_linkedlist()
     CU_ASSERT_PTR_NULL(ll->last->next);
 
     delete_linked_list(ll);
+    free(tfs);
 }
 
 void test_remove_from_linkedlist()
