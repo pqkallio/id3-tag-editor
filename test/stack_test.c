@@ -13,8 +13,7 @@ void test_stack()
 
     int baba[3];
 
-    void *popped = pop_stack(stack);
-    CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), (void *)-1);
+    CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), stack->bottom);
 
     CU_ASSERT_EQUAL_FATAL(push_to_stack(stack, &baba[0]), 1);
     CU_ASSERT_EQUAL_FATAL(push_to_stack(stack, &baba[1]), 1);
@@ -24,8 +23,8 @@ void test_stack()
     CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), &baba[1]);
     CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), &baba[0]);
 
-    CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), (void *)-1);
-    CU_ASSERT_PTR_EQUAL_FATAL(peek_stack(stack), (void *)-1);
+    CU_ASSERT_PTR_EQUAL_FATAL(pop_stack(stack), stack->bottom);
+    CU_ASSERT_PTR_EQUAL_FATAL(peek_stack(stack), stack->bottom);
 
     push_to_stack(stack, &baba[0]);
     push_to_stack(stack, &baba[1]);

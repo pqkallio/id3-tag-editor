@@ -1,9 +1,9 @@
 #include <malloc.h>
 #include "mem.h"
 
-void free_entry(void *entry)
+void free_entry(const void *entry)
 {
-    free(entry);
+    free((void *)entry);
 }
 
 MemMap *new_memmap()
@@ -22,7 +22,23 @@ void delete_memmap(MemMap *map)
     if (!map)
         return;
 
-    hashmap_foreach(map->entries, free_entry);
+    if (map->entries)
+    {
+        hashmap_foreach(map->entries, free_entry);
+        delete_hashmap(map->entries);
+    }
+
+    if (map->temp_alloc)
+    {
+        while (peek_stack(map->temp_alloc) != map->temp_alloc->bottom)
+        {
+            temp_alloc_area_destroy(map);
+        }
+
+        delete_stack(map->temp_alloc);
+    }
+
+    free(map);
 }
 
 void *memmap_allocate(MemMap *map, const char *key, size_t num_items, size_t item_size)
@@ -82,11 +98,11 @@ void temp_alloc_area_destroy(MemMap *map)
         return;
     }
 
-    void *ptr = pop_stack(map->temp_alloc);
+    void *ptr = (void *)pop_stack(map->temp_alloc);
 
-    while (ptr != NULL && ptr != &STACK_BOTTOM_)
+    while (ptr != NULL && ptr != map->temp_alloc->bottom)
     {
         free(ptr);
-        ptr = pop_stack(map->temp_alloc);
+        ptr = (void *)pop_stack(map->temp_alloc);
     }
 }

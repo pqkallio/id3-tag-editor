@@ -77,3 +77,71 @@ void test_hashmap_funcs_with_null_pointers()
 
     delete_hashmap(NULL);
 }
+
+const void *items[4] = {0};
+int i = 0;
+
+void mock_callback(const void *item)
+{
+    items[i] = item;
+    i++;
+}
+
+void test_hashmap_foreach()
+{
+    HashMap *map = new_hashmap();
+    int handled[4] = {0};
+    int j;
+
+    int one = 1;
+    int two = 2;
+    int three = 3;
+    int four = 4;
+
+    hashmap_set(map, "one", &one);
+    hashmap_set(map, "two", &two);
+    hashmap_set(map, "three", &three);
+    hashmap_set(map, "four", &four);
+
+    for (j = 0; j < 4; j++)
+    {
+        CU_ASSERT_PTR_NULL_FATAL(items[j]);
+    }
+
+    for (j = 0; j < 4; j++)
+    {
+        CU_ASSERT_EQUAL_FATAL(handled[j], 0);
+    }
+
+    hashmap_foreach(map, mock_callback);
+
+    for (i = 0; i < 4; i++)
+    {
+        const void *item = items[i];
+
+        if (item == &one)
+        {
+            handled[0] = 1;
+        }
+        else if (item == &two)
+        {
+            handled[1] = 1;
+        }
+        else if (item == &three)
+        {
+            handled[2] = 1;
+        }
+        else if (item == &four)
+        {
+            handled[3] = 1;
+        }
+    }
+
+    for (j = 0; j < 4; j++)
+    {
+        CU_ASSERT_EQUAL_FATAL(handled[j], 1);
+    }
+
+    hashmap_foreach(NULL, mock_callback);
+    hashmap_foreach(map, NULL);
+}

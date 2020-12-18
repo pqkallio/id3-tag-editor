@@ -4,7 +4,7 @@
 typedef struct _linked_list_item
 {
     char *key;
-    void *item;
+    const void *item;
     struct _linked_list_item *prev;
     struct _linked_list_item *next;
 } LinkedListItem;

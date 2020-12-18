@@ -4,12 +4,13 @@
 Stack *new_stack(unsigned long size)
 {
     Stack *stack = calloc(1, sizeof(Stack));
-    void **arr = calloc(size + 1, sizeof(void *));
+    const void **arr = calloc(size + 1, sizeof(void *));
 
     stack->stack = arr;
     stack->max = size + 1;
 
-    stack->stack[0] = &STACK_BOTTOM_;
+    stack->bottom = malloc(sizeof(void *));
+    stack->stack[0] = stack->bottom;
 
     return stack;
 }
@@ -24,6 +25,11 @@ void delete_stack(Stack *stack)
     if (stack->stack)
     {
         free(stack->stack);
+    }
+
+    if (stack->bottom)
+    {
+        free(stack->bottom);
     }
 
     free(stack);
@@ -51,7 +57,7 @@ unsigned int push_to_stack(Stack *stack, const void *item)
     return 1;
 }
 
-void *pop_stack(Stack *stack)
+const void *pop_stack(Stack *stack)
 {
     if (!stack || !stack->stack)
     {
@@ -60,19 +66,19 @@ void *pop_stack(Stack *stack)
 
     if (stack->idx == 0)
     {
-        return (void *)-1;
+        return stack->bottom;
     }
 
-    void *item = stack->stack[stack->idx];
+    const void *item = stack->stack[stack->idx];
 
     stack->idx--;
 
     return item;
 }
 
-void *peek_stack(Stack *stack)
+const void *peek_stack(Stack *stack)
 {
-    void *item = pop_stack(stack);
+    const void *item = pop_stack(stack);
 
     if (item == NULL)
     {

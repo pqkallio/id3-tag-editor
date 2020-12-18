@@ -50,6 +50,7 @@ int main()
         {"HashMap with default size", test_hashmap},
         {"HashMap with size 42", test_hashmap_with_size},
         {"HashMap tests with null pointers", test_hashmap_funcs_with_null_pointers},
+        {"HashMap foreach", test_hashmap_foreach},
         CU_TEST_INFO_NULL};
 
     CU_TestInfo stack_tests[] = {
