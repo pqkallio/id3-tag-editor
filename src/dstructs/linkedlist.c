@@ -1,12 +1,13 @@
-#include <malloc.h>
 #include <string.h>
 #include "linkedlist.h"
 #include "../util/strings.h"
 
-LinkedListItem *new_linked_list_item(const char *key, const void *item)
+LinkedListItem *new_linked_list_item(const MemMap *memmap, const char *key, const void *item)
 {
-    LinkedListItem *ll_item = calloc(1, sizeof(LinkedListItem));
-    char *item_key = string_copy(key);
+    MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
+
+    LinkedListItem *ll_item = mem->allocate(mem, 1, sizeof(LinkedListItem));
+    char *item_key = string_copy(mem, key);
 
     ll_item->item = item;
     ll_item->key = item_key;
@@ -19,8 +20,10 @@ void delete_linked_list_item(LinkedListItem *item)
     if (!item)
         return;
 
-    free(item->key);
-    free(item);
+    const MemMap *mem = item->memmap;
+
+    mem->free(mem, item->key);
+    mem->free(mem, item);
 }
 
 void linked_list_append(LinkedList *list, const char *key, const void *item)
@@ -30,7 +33,7 @@ void linked_list_append(LinkedList *list, const char *key, const void *item)
         return;
     }
 
-    LinkedListItem *ll_item = new_linked_list_item(key, item);
+    LinkedListItem *ll_item = new_linked_list_item(list->memmap, key, item);
 
     list->size++;
 
@@ -53,11 +56,11 @@ void linked_list_append(LinkedList *list, const char *key, const void *item)
     ll_item = list->first;
 }
 
-unsigned int linked_list_remove(LinkedList *list, const char *key)
+bool linked_list_remove(LinkedList *list, const char *key)
 {
     if (!list)
     {
-        return 0;
+        return false;
     }
 
     LinkedListItem *ll_item = list->first;
@@ -94,16 +97,19 @@ unsigned int linked_list_remove(LinkedList *list, const char *key)
 
         delete_linked_list_item(ll_item);
 
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
-LinkedList *new_linked_list()
+LinkedList *new_linked_list(const MemMap *memmap)
 {
-    LinkedList *list = calloc(1, sizeof(LinkedList));
+    MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
 
+    LinkedList *list = mem->allocate(mem, 1, sizeof(LinkedList));
+
+    list->memmap = mem;
     list->append = linked_list_append;
     list->remove = linked_list_remove;
 
@@ -127,5 +133,5 @@ void delete_linked_list(LinkedList *list)
         ll_item = next;
     }
 
-    free(list);
+    list->memmap->free(list->memmap, list);
 }

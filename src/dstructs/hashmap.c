@@ -1,21 +1,7 @@
 #include <malloc.h>
 #include <string.h>
 #include "hashmap.h"
-
-/* djb2 * This algorithm was first reported by Dan Bernstein many years ago in comp.lang.c */
-unsigned long hash(const char *str)
-{
-    unsigned long hash = 5381;
-
-    int c;
-
-    while ((c = *str++))
-    {
-        hash = ((hash << 5) + hash) + c;
-    }
-
-    return hash;
-}
+#include "src/util/hash.h"
 
 const void *hashmap_get(const HashMap *map, const char *key)
 {
@@ -61,7 +47,7 @@ void hashmap_set(HashMap *map, const char *key, const void *value)
 
     if (!ll)
     {
-        map->map[hash_key] = new_linked_list();
+        map->map[hash_key] = new_linked_list(map->memmap);
         ll = map->map[hash_key];
     }
 
@@ -90,19 +76,21 @@ void hashmap_remove(HashMap *map, const char *key)
         map->size--;
 }
 
-HashMap *new_hashmap_with_size(unsigned long size)
+HashMap *new_hashmap_with_size(const MemMap *memmap, unsigned long size)
 {
-    HashMap *map = calloc(1, sizeof(HashMap));
+    const MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
+    HashMap *map = mem->allocate(mem, 1, sizeof(HashMap));
 
+    map->memmap = mem;
     map->n_slots = size;
-    map->map = calloc(map->n_slots, sizeof(LinkedList *));
+    map->map = mem->allocate(mem, map->n_slots, sizeof(LinkedList *));
 
     return map;
 }
 
-HashMap *new_hashmap()
+HashMap *new_hashmap(const MemMap *memmap)
 {
-    return new_hashmap_with_size(100);
+    return new_hashmap_with_size(memmap, 100);
 }
 
 void delete_hashmap(HashMap *map)
@@ -119,9 +107,10 @@ void delete_hashmap(HashMap *map)
         delete_linked_list(ll);
     }
 
-    free(map->map);
+    const MemMap *mem = map->memmap;
 
-    free(map);
+    mem->free(mem, map->map);
+    mem->free(mem, map);
 }
 
 void hashmap_foreach(HashMap *map, void (*callback)(const void *item))

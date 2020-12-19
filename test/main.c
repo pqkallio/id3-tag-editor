@@ -59,8 +59,7 @@ int main()
         CU_TEST_INFO_NULL};
 
     CU_TestInfo mem_tests[] = {
-        {"MemMap allocation test", test_memmap_allocate},
-        {"MemMap block allocation test", test_block_allocation}};
+        {"MemMap allocation test", test_memmap_allocate}};
 
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),

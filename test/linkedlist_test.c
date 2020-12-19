@@ -4,10 +4,11 @@
 #include "src/dstructs/linkedlist.h"
 #include "src/domain/tagv2.h"
 #include "malloc.h"
+#include "src/mem/mem.h"
 
 void test_empty_linkedlist()
 {
-    LinkedList *ll = new_linked_list();
+    LinkedList *ll = new_linked_list(&DEFAULT_MEMMAP);
 
     CU_ASSERT_EQUAL(ll->size, 0);
     CU_ASSERT_PTR_NULL(ll->first);
@@ -18,7 +19,7 @@ void test_empty_linkedlist()
 
 void test_append_to_linkedlist()
 {
-    LinkedList *ll = new_linked_list();
+    LinkedList *ll = new_linked_list(&DEFAULT_MEMMAP);
     TagV2Frame *tfs = calloc(2, sizeof(TagV2Frame));
 
     ll->append(ll, "a", &tfs[0]);
@@ -47,7 +48,7 @@ void test_append_to_linkedlist()
 
 void test_remove_from_linkedlist()
 {
-    LinkedList *ll = new_linked_list();
+    LinkedList *ll = new_linked_list(&DEFAULT_MEMMAP);
 
     char a[] = "a";
     char b[] = "b";
@@ -104,7 +105,7 @@ void test_remove_from_linkedlist()
 
 void test_linkedlist_is_null()
 {
-    LinkedList *ll = new_linked_list();
+    LinkedList *ll = new_linked_list(&DEFAULT_MEMMAP);
     void *item = (void *)-1;
 
     ll->append(NULL, "key", item);
