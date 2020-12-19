@@ -1,7 +1,7 @@
 #include <malloc.h>
 #include <string.h>
 #include "hashmap.h"
-#include "src/util/hash.h"
+#include "../util/hash.h"
 
 const void *hashmap_get(const HashMap *map, const char *key)
 {

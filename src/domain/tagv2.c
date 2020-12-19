@@ -1,7 +1,7 @@
 #include <string.h>
 #include "tagv2.h"
-#include "src/util/strings.h"
-#include "src/mem/mem.h"
+#include "../util/strings.h"
+#include "../mem/mem.h"
 
 void add_tag_v2_frame(
     TagV2 *tag,

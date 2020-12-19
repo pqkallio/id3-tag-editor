@@ -2,7 +2,7 @@
 #define _DSTRUCTS_LINKEDLIST_H
 
 #include <stdbool.h>
-#include "src/mem/mem.h"
+#include "../mem/mem.h"
 
 typedef struct _linked_list_item
 {

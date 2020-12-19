@@ -2,7 +2,7 @@
 #define _DSTRUCTS_HASHMAP_H
 
 #include "linkedlist.h"
-#include "src/mem/mem.h"
+#include "../mem/mem.h"
 
 typedef struct _hashmap
 {

@@ -1,7 +1,7 @@
 #include "hashset.h"
 #include "linkedlist.h"
-#include "src/mem/mem.h"
-#include "src/util/hash.h"
+#include "../mem/mem.h"
+#include "../util/hash.h"
 
 unsigned long hashset_default_hash(const MemMap *memmap, const void *item)
 {
@@ -126,12 +126,12 @@ HashSet *new_hashset_with_size(
   HashSet *hashset = mem->allocate(mem, 1, sizeof(HashSet));
 
   unsigned long (*hash_func)(const MemMap *memmap, const void *item) = hash ? hash : hashset_default_hash;
-  long (*compare_items)(const void *hashset_item, const void *input_item) =
+  long (*compare_items_func)(const void *hashset_item, const void *input_item) =
       compare_items ? compare_items : hashset_default_compare_items;
 
   hashset->n_slots = n_slots;
   hashset->memmap = mem;
-  hashset->compare_items = compare_items;
+  hashset->compare_items = compare_items_func;
   hashset->hash = hash_func;
   hashset->set = mem->allocate(mem, n_slots, sizeof(LinkedList *));
   hashset->size = 0;

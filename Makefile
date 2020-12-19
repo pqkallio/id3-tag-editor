@@ -3,7 +3,9 @@ COVDIR = coverage
 CC = gcc
 COV = lcov
 HTMLGEN = genhtml
-_DEPS =	mem/mem.h \
+_DEPS =	dstructs/hashset_errors.h \
+				dstructs/hashset.h \
+				mem/mem.h \
 				parser/parser.h \
 				util/binary.h \
 				util/strings.h \
@@ -12,8 +14,6 @@ _DEPS =	mem/mem.h \
 				dstructs/linkedlist.h \
 				dstructs/hashmap.h \
 				dstructs/stack.h \
-				dstructs/hashset.h \
-				dstructs/hashset_errors.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 EXEC = id3-tag-editor
 TESTER = tester

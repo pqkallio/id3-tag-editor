@@ -11,5 +11,5 @@ void test_string_copy()
   CU_ASSERT_PTR_NOT_EQUAL(copy, original);
   CU_ASSERT_STRING_EQUAL(original, copy);
 
-  free(copy);
+  DEFAULT_MEMMAP.free(&DEFAULT_MEMMAP, copy);
 }

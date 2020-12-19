@@ -2,7 +2,7 @@
 #define _ID3_TAG_EDITOR_UTIL_STRINGS_H
 
 #include <string.h>
-#include "src/mem/mem.h"
+#include "../mem/mem.h"
 
 static inline char *string_copy(const MemMap *memmap, const char *str)
 {

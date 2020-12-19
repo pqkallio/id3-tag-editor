@@ -2,8 +2,8 @@
 #define _ID3_TAG_EDITOR_DOMAIN_TAGV2_H
 
 #include <stdint.h>
-#include "src/dstructs/hashmap.h"
-#include "src/mem/mem.h"
+#include "../dstructs/hashmap.h"
+#include "../mem/mem.h"
 
 #define ID3 "ID3"
 

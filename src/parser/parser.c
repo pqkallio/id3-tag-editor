@@ -4,9 +4,10 @@
 #include "parser.h"
 #include "util/binary.h"
 
-int has_v2_tag(FILE* mp3file)
+int has_v2_tag(FILE *mp3file)
 {
-    if (mp3file == NULL) {
+    if (mp3file == NULL)
+    {
         return 0;
     }
 
@@ -14,7 +15,8 @@ int has_v2_tag(FILE* mp3file)
 
     fgets(tag, 4, mp3file);
 
-    if (feof(mp3file)) {
+    if (feof(mp3file))
+    {
         return 0;
     }
 
@@ -63,7 +65,7 @@ int has_v2_tag(FILE* mp3file)
  * VII   A zero byte is SOMETIMES included, and should be ignored.
  * VIII  Because of the zero byte (see VII), the content's length is size-1 bytes. It is a non-null-terminated string.
  */
-TagV2* parse_v2_tag(FILE* mp3file)
+TagV2 *parse_v2_tag(const MemMap *memmap, FILE *mp3file)
 {
     uint16_t version;
     unsigned char flags;
@@ -73,7 +75,8 @@ TagV2* parse_v2_tag(FILE* mp3file)
     fread(&flags, sizeof(unsigned char), 1, mp3file);
     fread(&_tag_size, sizeof(char), 4, mp3file);
 
-    if (feof(mp3file)) {
+    if (feof(mp3file))
+    {
         return NULL;
     }
 
@@ -81,14 +84,15 @@ TagV2* parse_v2_tag(FILE* mp3file)
     // together and interpret that as the tag size.
     uint32_t tag_size = remove_padding(_tag_size, 4, 7);
 
-    TagV2* tagV2 = new_tag_v2(version, flags, tag_size);
+    TagV2 *tagV2 = new_tag_v2(memmap, version, flags, tag_size);
 
     unsigned int i = 0;
-    char* body = NULL;
+    char *body = NULL;
     char zero_byte = 'x';
 
     // Let's start reading frames.
-    while (i < tag_size && !feof(mp3file)) {
+    while (i < tag_size && !feof(mp3file))
+    {
         char frame_id[] = {0, 0, 0, 0, 0};
         uint32_t frame_size;
         char flags[] = {0, 0};
@@ -98,22 +102,25 @@ TagV2* parse_v2_tag(FILE* mp3file)
         read_big_endian_int(&frame_size, mp3file);
         fread(&flags, sizeof(char), 2, mp3file);
 
-        if (frame_size < 1) {
+        if (frame_size < 1)
+        {
             break;
         }
 
         // If something bad happens...
-        if (feof(mp3file)) {
+        if (feof(mp3file))
+        {
             return tagV2;
         }
 
         i += frame_size + 10; // frame size + header size
 
-        body = calloc(frame_size, sizeof(char));
+        body = memmap->allocate(memmap, frame_size, sizeof(char));
 
         fread(&zero_byte, sizeof(char), 1, mp3file);
 
-        if (zero_byte != 0) {
+        if (zero_byte != 0)
+        {
             fseek(mp3file, -1, SEEK_CUR);
             has_zero_byte = 0;
         }
@@ -122,20 +129,22 @@ TagV2* parse_v2_tag(FILE* mp3file)
 
         add_tag_v2_frame(tagV2, frame_id, frame_size, flags, body, has_zero_byte);
 
-        if (body != NULL) free(body);
+        memmap->free(memmap, body);
     }
 
     return tagV2;
 }
 
-TagV2* parseMP3(FILE* mp3file)
+TagV2 *parseMP3(const MemMap *memmap, FILE *mp3file)
 {
-    if (mp3file == NULL) {
+    if (mp3file == NULL)
+    {
         return NULL;
     }
 
-    if (has_v2_tag(mp3file)) {
-        return parse_v2_tag(mp3file);
+    if (has_v2_tag(mp3file))
+    {
+        return parse_v2_tag(memmap, mp3file);
     }
 
     return NULL;

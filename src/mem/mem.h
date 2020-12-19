@@ -70,13 +70,13 @@ typedef struct _mem_map
 MemMap *new_memmap();
 void delete_memmap(MemMap *map);
 
-void *default_alloc(const MemMap *map, size_t num_items, size_t item_size)
+static void *default_alloc(const MemMap *map, size_t num_items, size_t item_size)
 {
     map->clear(map);
     return calloc(num_items, item_size);
 }
 
-MemError default_free(const MemMap *map, const void *item)
+static MemError default_free(const MemMap *map, const void *item)
 {
     map->clear(map);
     free((void *)item);

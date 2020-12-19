@@ -2,7 +2,7 @@
 #define _DSTRUCTS_HASHSET_H
 
 #include "linkedlist.h"
-#include "src/mem/mem.h"
+#include "../mem/mem.h"
 #include "hashset_errors.h"
 
 static const unsigned long DEFAULT_N_SLOTS = 100;

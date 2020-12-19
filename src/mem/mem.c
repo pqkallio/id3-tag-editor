@@ -1,7 +1,11 @@
 #include <malloc.h>
 #include "mem.h"
 
-static inline char *string_copy(const char *str)
+extern void *default_alloc(const MemMap *map, size_t num_items, size_t item_size);
+
+extern MemError default_free(const MemMap *map, const void *item);
+
+static inline char *mem_string_copy(const char *str)
 {
     char *s = (char *)calloc(strlen(str) + 1, sizeof(char));
 
@@ -21,17 +25,17 @@ unsigned long allocation_set_hash(const void *item)
     return str_hash;
 }
 
-long compare_items(const void *set_item, const void *input_item)
+long mem_compare_items(const void *set_item, const void *input_item)
 {
     long diff = set_item - input_item;
 
     return diff;
 }
 
-AllocationListItem *new_linked_list_item(const char *key, const void *item)
+AllocationListItem *new_allocation_list_item(const char *key, const void *item)
 {
     AllocationListItem *ll_item = calloc(1, sizeof(AllocationListItem));
-    char *item_key = string_copy(key);
+    char *item_key = mem_string_copy(key);
 
     ll_item->item = item;
     ll_item->key = item_key;
@@ -39,7 +43,7 @@ AllocationListItem *new_linked_list_item(const char *key, const void *item)
     return ll_item;
 }
 
-void delete_linked_list_item(AllocationListItem *item)
+void delete_allocation_list_item(AllocationListItem *item)
 {
     if (!item)
         return;
@@ -48,14 +52,14 @@ void delete_linked_list_item(AllocationListItem *item)
     free(item);
 }
 
-void linked_list_append(AllocationList *list, const char *key, const void *item)
+void allocation_list_append(AllocationList *list, const char *key, const void *item)
 {
     if (!list)
     {
         return;
     }
 
-    AllocationListItem *ll_item = new_linked_list_item(key, item);
+    AllocationListItem *ll_item = new_allocation_list_item(key, item);
 
     list->size++;
 
@@ -78,7 +82,7 @@ void linked_list_append(AllocationList *list, const char *key, const void *item)
     ll_item = list->first;
 }
 
-bool linked_list_remove(AllocationList *list, const char *key)
+bool allocation_list_remove(AllocationList *list, const char *key)
 {
     if (!list)
     {
@@ -117,7 +121,7 @@ bool linked_list_remove(AllocationList *list, const char *key)
             list->last = ll_item->prev;
         }
 
-        delete_linked_list_item(ll_item);
+        delete_allocation_list_item(ll_item);
 
         return true;
     }
@@ -125,17 +129,17 @@ bool linked_list_remove(AllocationList *list, const char *key)
     return false;
 }
 
-AllocationList *new_linked_list()
+AllocationList *new_allocation_list()
 {
     AllocationList *list = calloc(1, sizeof(AllocationList));
 
-    list->append = linked_list_append;
-    list->remove = linked_list_remove;
+    list->append = allocation_list_append;
+    list->remove = allocation_list_remove;
 
     return list;
 }
 
-void delete_linked_list(AllocationList *list)
+void delete_allocation_list(AllocationList *list)
 {
     if (!list)
     {
@@ -148,7 +152,7 @@ void delete_linked_list(AllocationList *list)
     while (ll_item != NULL)
     {
         next = ll_item->next;
-        delete_linked_list_item(ll_item);
+        delete_allocation_list_item(ll_item);
         ll_item = next;
     }
 
@@ -205,7 +209,7 @@ bool allocation_set_add(AllocationSet *set, const void *item)
 
     if (!ll)
     {
-        set->set[hash_key] = new_linked_list();
+        set->set[hash_key] = new_allocation_list();
         ll = set->set[hash_key];
     }
 
@@ -221,7 +225,7 @@ bool allocation_set_add(AllocationSet *set, const void *item)
     return true;
 }
 
-bool hashset_remove(AllocationSet *set, const void *item)
+bool allocation_set_remove(AllocationSet *set, const void *item)
 {
     if (!set || !item)
     {
@@ -249,22 +253,19 @@ bool hashset_remove(AllocationSet *set, const void *item)
     return true;
 }
 
-AllocationSet *new_hashset()
+AllocationSet *new_allocation_set()
 {
     AllocationSet *as = calloc(1, sizeof(AllocationSet));
 
-    long (*compare_items)(const void *set_item, const void *input_item) =
-        compare_items ? compare_items : compare_items;
-
     as->n_slots = 100;
-    as->compare_items = compare_items;
+    as->compare_items = mem_compare_items;
     as->hash = allocation_set_hash;
     as->set = calloc(100, sizeof(AllocationList *));
     as->size = 0;
 
     as->add = allocation_set_add;
     as->get = allocation_set_get;
-    as->remove = hashset_remove;
+    as->remove = allocation_set_remove;
 
     return as;
 }
