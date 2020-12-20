@@ -3,7 +3,14 @@
 
 #include "linkedlist.h"
 #include "../mem/mem.h"
-#include "hashset_errors.h"
+#include <stdint.h>
+
+typedef uint8_t HSError;
+
+static const HSError HSE_SUCCESS = 0;
+static const HSError HSE_NOT_FOUND = 1;
+static const HSError HSE_ALREADY_EXISTS = 2;
+static const HSError HSE_SET_OR_ITEM_NOT_PROVIDED = 3;
 
 static const unsigned long DEFAULT_N_SLOTS = 100;
 

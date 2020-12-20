@@ -151,3 +151,23 @@ HashSet *new_hashset(
 {
   return new_hashset_with_size(memmap, hash, compare_items, DEFAULT_N_SLOTS);
 }
+
+void delete_hashset(HashSet *set)
+{
+  if (!set)
+  {
+    return;
+  }
+
+  for (unsigned int i = 0; i < set->n_slots; i++)
+  {
+    LinkedList *ll = set->set[i];
+
+    delete_linked_list(ll);
+  }
+
+  const MemMap *mem = set->memmap;
+
+  mem->free(mem, set->set);
+  mem->free(mem, set);
+}

@@ -7,6 +7,7 @@
 #include "hashmap_test.h"
 #include "strings_test.h"
 #include "mem_test.h"
+#include "hashset_test.h"
 
 CU_SuiteInfo create_test_suite(char *name, CU_TestInfo *tests)
 {
@@ -54,6 +55,12 @@ int main()
         {"HashMap foreach", test_hashmap_foreach},
         CU_TEST_INFO_NULL};
 
+    CU_TestInfo hashset_tests[] = {
+        {"HashSet with default size", test_hashset},
+        {"HashSet with size 42", test_hashset_with_size},
+        {"HashSet tests with null pointers", test_hashset_funcs_with_null_pointers},
+        CU_TEST_INFO_NULL};
+
     CU_TestInfo stack_tests[] = {
         {"Stack test", test_stack},
         CU_TEST_INFO_NULL};
@@ -69,6 +76,7 @@ int main()
         create_test_suite("dstructs/linkedlist.c", linkedlist_tests),
         create_test_suite("dstructs/hashmap.c", hashmap_tests),
         create_test_suite("mem/mem.c", mem_tests),
+        create_test_suite("dstructs/hashset.c", hashset_tests),
         CU_SUITE_INFO_NULL,
     };
 

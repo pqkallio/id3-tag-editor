@@ -56,6 +56,11 @@ void delete_tag_v2_frame(TagV2Frame *frame)
     mem->free(mem, frame);
 }
 
+void delete_tag_v2_frame_from_map(const void *item)
+{
+    delete_tag_v2_frame((TagV2Frame *)item);
+}
+
 void delete_tag_v2(TagV2 *tag)
 {
     if (!tag)
@@ -63,6 +68,7 @@ void delete_tag_v2(TagV2 *tag)
         return;
     }
 
+    hashmap_foreach(tag->frames, delete_tag_v2_frame_from_map);
     delete_hashmap(tag->frames);
 
     tag->memmap->free(tag->memmap, tag);

@@ -77,6 +77,7 @@ void test_hashmap_funcs_with_null_pointers()
     hashmap_set(map, "key", NULL);
 
     delete_hashmap(NULL);
+    delete_hashmap(map);
 }
 
 const void *items[4] = {0};
