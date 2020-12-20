@@ -11,7 +11,7 @@ void add_tag_v2_frame(
     const char *body,
     unsigned char has_zero_byte)
 {
-    MemMap *memmap = tag->memmap;
+    const MemMap *memmap = tag->memmap;
     TagV2Frame *new_frame = memmap->allocate(memmap, 1, sizeof(TagV2Frame));
 
     new_frame->memmap = memmap;
@@ -26,7 +26,7 @@ void add_tag_v2_frame(
     hashmap_set(tag->frames, id, new_frame);
 }
 
-TagV2 *new_tag_v2(MemMap *memmap, uint16_t version, unsigned char flags, uint32_t size)
+TagV2 *new_tag_v2(const MemMap *memmap, uint16_t version, unsigned char flags, uint32_t size)
 {
     TagV2 *tag = memmap->allocate(memmap, 1, sizeof(TagV2));
 

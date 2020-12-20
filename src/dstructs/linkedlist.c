@@ -4,7 +4,7 @@
 
 LinkedListItem *new_linked_list_item(const MemMap *memmap, const char *key, const void *item)
 {
-    MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
+    const MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
 
     LinkedListItem *ll_item = mem->allocate(mem, 1, sizeof(LinkedListItem));
     char *item_key = string_copy(mem, key);
@@ -105,7 +105,7 @@ bool linked_list_remove(LinkedList *list, const char *key)
 
 LinkedList *new_linked_list(const MemMap *memmap)
 {
-    MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
+    const MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
 
     LinkedList *list = mem->allocate(mem, 1, sizeof(LinkedList));
 

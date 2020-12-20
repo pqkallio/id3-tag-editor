@@ -25,20 +25,20 @@ typedef struct _tag_v2_frame_header
 
 typedef struct _tag_v2_frame
 {
-    MemMap *memmap;
+    const MemMap *memmap;
     TagV2FrameHeader header;
     char *body;
 } TagV2Frame;
 
 typedef struct _tag_v2
 {
-    MemMap *memmap;
+    const MemMap *memmap;
     TagV2Header header;
     HashMap *frames;
     size_t frame_count;
 } TagV2;
 
-TagV2 *new_tag_v2(MemMap *memmap, uint16_t version, unsigned char flags, uint32_t size);
+TagV2 *new_tag_v2(const MemMap *memmap, uint16_t version, unsigned char flags, uint32_t size);
 void delete_tag_v2(TagV2 *tag);
 
 void add_tag_v2_frame(

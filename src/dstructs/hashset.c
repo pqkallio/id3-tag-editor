@@ -5,7 +5,12 @@
 
 unsigned long hashset_default_hash(const MemMap *memmap, const void *item)
 {
-  char *str = memmap->allocate(memmap, sizeof(void *) + 1, sizeof(char));
+  // Allocate enough bytes for a string representation of the pointer's address.
+  // Since each byte is represented by two characters, the address takes sizeof(void *) * 2 characters.
+  // Since it is preceded by "0x", we need two more bytes as well as extra null char in the end, thus +3.
+  char *str = memmap->allocate(memmap, sizeof(void *) * 2 + 3, sizeof(char));
+
+  sprintf(str, "%p", item);
 
   unsigned long str_hash = hash(str);
 
@@ -16,12 +21,12 @@ unsigned long hashset_default_hash(const MemMap *memmap, const void *item)
 
 long hashset_default_compare_items(const void *hashset_item, const void *input_item)
 {
-  long diff = hashset_item - input_item;
+  long diff = (long)hashset_item - (long)input_item;
 
   return diff;
 }
 
-const void *hashset_get_item_from_list(const HashSet *set, const LinkedList *list, void *item)
+const void *hashset_get_item_from_list(const HashSet *set, const LinkedList *list, const void *item)
 {
   LinkedListItem *ll_item = list->first;
 
@@ -101,7 +106,7 @@ HSError hashset_remove(HashSet *set, const void *item)
 
   if (!ll)
   {
-    return;
+    return HSE_NOT_FOUND;
   }
 
   unsigned int removed = ll->remove(ll, item);
