@@ -11,6 +11,7 @@ LinkedListItem *new_linked_list_item(const MemMap *memmap, const char *key, cons
 
     ll_item->item = item;
     ll_item->key = item_key;
+    ll_item->memmap = mem;
 
     return ll_item;
 }

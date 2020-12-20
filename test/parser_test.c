@@ -84,7 +84,5 @@ void test_id3v2_parser()
 
   close_and_remove_test_file();
 
-  CU_ASSERT_TRUE(1);
-
   delete_tag_v2(actual);
 }

@@ -383,6 +383,11 @@ MemMap *new_memmap()
 
 void delete_memmap(MemMap *map)
 {
+    if (!map)
+    {
+        return;
+    }
+
     map->clear(map);
 
     delete_allocation_set(map->entries);
