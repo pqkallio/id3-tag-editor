@@ -51,9 +51,9 @@ typedef struct _allocation_set
    */
     unsigned long (*hash)(const void *item);
 
-    const void *(*get)(struct _allocation_set *set, const void *item);
-    bool (*add)(const struct _allocation_set *set, const void *item);
-    bool (*remove)(const struct _allocation_set *set, const void *item);
+    const void *(*get)(const struct _allocation_set *set, const void *item);
+    bool (*add)(struct _allocation_set *set, const void *item);
+    bool (*remove)(struct _allocation_set *set, const void *item);
 
     AllocationList **set;
 } AllocationSet;
@@ -72,14 +72,20 @@ void delete_memmap(MemMap *map);
 
 static void *default_alloc(const MemMap *map, size_t num_items, size_t item_size)
 {
-    map->clear(map);
+    if (map || !map)
+    {
+        return calloc(num_items, item_size);
+    }
+
     return calloc(num_items, item_size);
 }
 
 static MemError default_free(const MemMap *map, const void *item)
 {
-    map->clear(map);
-    free((void *)item);
+    if (map || !map)
+    {
+        free((void *)item);
+    }
 
     return MEME_SUCCESS;
 }

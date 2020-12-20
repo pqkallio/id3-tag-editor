@@ -29,9 +29,9 @@ typedef struct _hashset
    */
   unsigned long (*hash)(const MemMap *memmap, const void *item);
 
-  const void *(*get)(struct _hashset *set, const void *item);
-  HSError (*add)(const struct _hashset *set, const void *item);
-  HSError (*remove)(const struct _hashset *set, const void *item);
+  const void *(*get)(const struct _hashset *set, const void *item);
+  HSError (*add)(struct _hashset *set, const void *item);
+  HSError (*remove)(struct _hashset *set, const void *item);
 
   LinkedList **set;
 } HashSet;
@@ -46,7 +46,7 @@ typedef struct _hashset
  */
 HashSet *new_hashset(
     const MemMap *memmap,
-    unsigned long (*hash)(const void *item),
+    unsigned long (*hash)(const MemMap *memmap, const void *item),
     long (*compare_items)(const void *hashset_item, const void *input_item));
 
 /**
@@ -55,7 +55,7 @@ HashSet *new_hashset(
  */
 HashSet *new_hashset_with_size(
     const MemMap *memmap,
-    unsigned long (*hash)(const void *item),
+    unsigned long (*hash)(const MemMap *memmap, const void *item),
     long (*compare_items)(const void *hashset_item, const void *input_item),
     unsigned long n_slots);
 

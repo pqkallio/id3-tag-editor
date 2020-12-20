@@ -1,4 +1,6 @@
 #include <malloc.h>
+#include <string.h>
+#include "../util/hash.h"
 #include "mem.h"
 
 extern void *default_alloc(const MemMap *map, size_t num_items, size_t item_size);
@@ -16,7 +18,12 @@ static inline char *mem_string_copy(const char *str)
 
 unsigned long allocation_set_hash(const void *item)
 {
-    char *str = calloc(sizeof(void *) + 1, sizeof(char));
+    // Allocate enough bytes for a string representation of the pointer's address.
+    // Since each byte is represented by two characters, the address takes sizeof(void *) * 2 characters.
+    // Since it is preceded by "0x", we need two more bytes as well as extra null char in the end, thus +3.
+    char *str = calloc(sizeof(void *) * 2 + 3, sizeof(char));
+
+    sprintf(str, "%p", item);
 
     unsigned long str_hash = hash(str);
 
@@ -27,7 +34,7 @@ unsigned long allocation_set_hash(const void *item)
 
 long mem_compare_items(const void *set_item, const void *input_item)
 {
-    long diff = set_item - input_item;
+    long diff = (long)set_item - (long)input_item;
 
     return diff;
 }
@@ -158,7 +165,7 @@ void delete_allocation_list(AllocationList *list)
 
     free(list);
 }
-const void *allocation_set_get_item_from_list(const AllocationSet *set, const AllocationList *list, void *item)
+const void *allocation_set_get_item_from_list(const AllocationSet *set, const AllocationList *list, const void *item)
 {
     AllocationListItem *ll_item = list->first;
 
@@ -238,7 +245,7 @@ bool allocation_set_remove(AllocationSet *set, const void *item)
 
     if (!ll)
     {
-        return;
+        return false;
     }
 
     unsigned int removed = ll->remove(ll, item);
@@ -251,6 +258,49 @@ bool allocation_set_remove(AllocationSet *set, const void *item)
     set->size--;
 
     return true;
+}
+
+void delete_allocation_set(AllocationSet *set)
+{
+    if (!set)
+    {
+        return;
+    }
+
+    for (unsigned int i = 0; i < set->n_slots; i++)
+    {
+        AllocationList *ll = set->set[i];
+
+        delete_allocation_list(ll);
+    }
+
+    free(set->set);
+    free(set);
+}
+
+void allocation_set_foreach(AllocationSet *set, void (*callback)(const void *item))
+{
+    if (!set || !callback)
+    {
+        return;
+    }
+
+    for (unsigned int i = 0; i < set->n_slots; i++)
+    {
+        AllocationList *ll = set->set[i];
+
+        if (ll == NULL)
+            continue;
+
+        AllocationListItem *ll_item = ll->first;
+
+        while (ll_item)
+        {
+            callback(ll_item->item);
+
+            ll_item = ll_item->next;
+        }
+    }
 }
 
 AllocationSet *new_allocation_set()
@@ -270,7 +320,7 @@ AllocationSet *new_allocation_set()
     return as;
 }
 
-void free_entry(const void *entry)
+void free_allocation(const void *entry)
 {
     free((void *)entry);
 }
@@ -299,7 +349,7 @@ MemError memmap_free(const MemMap *map, const void *item)
         return MEME_INVALID_FREE;
     }
 
-    free_entry(item);
+    free_allocation(item);
 
     return MEME_SUCCESS;
 }
@@ -313,8 +363,7 @@ void clear_memmap(const MemMap *map)
 
     if (e)
     {
-        hashmap_foreach(e, free_entry);
-        delete_hashmap(e);
+        allocation_set_foreach(e, free_allocation);
     }
 }
 
@@ -335,6 +384,8 @@ MemMap *new_memmap()
 void delete_memmap(MemMap *map)
 {
     map->clear(map);
+
+    delete_allocation_set(map->entries);
 
     if (map->block_delimiter)
     {
