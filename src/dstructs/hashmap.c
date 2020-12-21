@@ -1,39 +1,30 @@
 #include <malloc.h>
 #include <string.h>
 #include "hashmap.h"
+#include "../util/hash.h"
 
-/* djb2 * This algorithm was first reported by Dan Bernstein many years ago in comp.lang.c */
-unsigned long hash(const char *str)
+const void *hashmap_get(const HashMap *map, const char *key)
 {
-    unsigned long hash = 5381;
-
-    int c;
-
-    while ((c = *str++)) {
-        hash = ((hash << 5) + hash) + c;
-    }
-
-    return hash;
-}
-
-const void* hashmap_get(const HashMap* map, const char* key)
-{
-    if (!map || !key) {
+    if (!map || !key)
+    {
         return NULL;
     }
 
     unsigned long item_hash = hash(key) % map->n_slots;
 
-    LinkedList* list = map->map[item_hash];
+    LinkedList *list = map->map[item_hash];
 
-    if (!list) {
+    if (!list)
+    {
         return NULL;
     }
 
-    LinkedListItem* ll_item = list->first;
+    LinkedListItem *ll_item = list->first;
 
-    while (ll_item) {
-        if (ll_item->item && !strcmp(key, ll_item->key)) {
+    while (ll_item)
+    {
+        if (ll_item->item && !strcmp(key, ll_item->key))
+        {
             return ll_item->item;
         }
 
@@ -43,18 +34,20 @@ const void* hashmap_get(const HashMap* map, const char* key)
     return NULL;
 }
 
-void hashmap_set(HashMap* map, const char* key, const void* value)
+void hashmap_set(HashMap *map, const char *key, const void *value)
 {
-    if (!map || !key || !value) {
+    if (!map || !key || !value)
+    {
         return;
     }
 
     unsigned long hash_key = hash(key) % map->n_slots;
 
-    LinkedList* ll = map->map[hash_key];
+    LinkedList *ll = map->map[hash_key];
 
-    if (!ll) {
-        map->map[hash_key] = new_linked_list();
+    if (!ll)
+    {
+        map->map[hash_key] = new_linked_list(map->memmap);
         ll = map->map[hash_key];
     }
 
@@ -63,52 +56,84 @@ void hashmap_set(HashMap* map, const char* key, const void* value)
     map->size++;
 }
 
-void hashmap_remove(HashMap* map, const char* key)
+void hashmap_remove(HashMap *map, const char *key)
 {
-    if (!map || !key) {
+    if (!map || !key)
+    {
         return;
     }
 
     unsigned long hash_key = hash(key) % map->n_slots;
 
-    LinkedList* ll = map->map[hash_key];
+    LinkedList *ll = map->map[hash_key];
 
-    if (!ll) {
+    if (!ll)
+    {
         return;
     }
 
-    if (ll->remove(ll, key)) map->size--;
+    if (ll->remove(ll, key))
+        map->size--;
 }
 
-HashMap* new_hashmap_with_size(unsigned long size)
+HashMap *new_hashmap_with_size(const MemMap *memmap, unsigned long size)
 {
-    HashMap* map = calloc(1, sizeof(HashMap));
+    const MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
+    HashMap *map = mem->allocate(mem, 1, sizeof(HashMap));
 
+    map->memmap = mem;
     map->n_slots = size;
-    map->map = calloc(map->n_slots, sizeof(LinkedList*));
+    map->map = mem->allocate(mem, map->n_slots, sizeof(LinkedList *));
 
     return map;
 }
 
-HashMap* new_hashmap()
+HashMap *new_hashmap(const MemMap *memmap)
 {
-    return new_hashmap_with_size(100);
+    return new_hashmap_with_size(memmap, 100);
 }
 
-
-void delete_hashmap(HashMap* map)
+void delete_hashmap(HashMap *map)
 {
-    if (!map) {
+    if (!map)
+    {
         return;
     }
 
-    for (unsigned int i = 0; i < map->n_slots; i++) {
-        LinkedList* ll = map->map[i];
+    for (unsigned int i = 0; i < map->n_slots; i++)
+    {
+        LinkedList *ll = map->map[i];
 
         delete_linked_list(ll);
     }
 
-    free(map->map);
+    const MemMap *mem = map->memmap;
 
-    free(map);
+    mem->free(mem, map->map);
+    mem->free(mem, map);
+}
+
+void hashmap_foreach(HashMap *map, void (*callback)(const void *item))
+{
+    if (!map || !callback)
+    {
+        return;
+    }
+
+    for (unsigned int i = 0; i < map->n_slots; i++)
+    {
+        LinkedList *ll = map->map[i];
+
+        if (ll == NULL)
+            continue;
+
+        LinkedListItem *ll_item = ll->first;
+
+        while (ll_item)
+        {
+            callback(ll_item->item);
+
+            ll_item = ll_item->next;
+        }
+    }
 }

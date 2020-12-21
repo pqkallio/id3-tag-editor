@@ -1,12 +1,14 @@
 #ifndef _ID3_TAG_EDITOR_UTIL_STRINGS_H
 #define _ID3_TAG_EDITOR_UTIL_STRINGS_H
 
-#include <malloc.h>
 #include <string.h>
+#include "../mem/mem.h"
 
-inline char* string_copy(const char* str)
+static inline char *string_copy(const MemMap *memmap, const char *str)
 {
-  char* s = (char*)calloc(strlen(str) + 1, sizeof(char));
+  const MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
+
+  char *s = (char *)mem->allocate(mem, strlen(str) + 1, sizeof(char));
 
   strcpy(s, str);
 
