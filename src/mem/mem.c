@@ -33,8 +33,6 @@ MemError memmap_free(const MemMap *map, const void *item)
         return MEME_INVALID_FREE;
     }
 
-    free_allocation(item);
-
     return MEME_SUCCESS;
 }
 
@@ -47,7 +45,7 @@ void clear_memmap(const MemMap *map)
 
     if (e)
     {
-        e->foreach (e, free_allocation);
+        e->clear(e);
     }
 }
 

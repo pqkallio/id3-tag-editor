@@ -146,4 +146,6 @@ void test_hashmap_foreach()
 
     hashmap_foreach(NULL, mock_callback);
     hashmap_foreach(map, NULL);
+
+    delete_hashmap(map);
 }

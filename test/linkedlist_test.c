@@ -113,4 +113,5 @@ void test_linkedlist_is_null()
     CU_ASSERT_EQUAL(ll->remove(NULL, "key"), 0);
 
     delete_linked_list(NULL);
+    delete_linked_list(ll);
 }

@@ -27,18 +27,18 @@ long mem_compare_items(const void *set_item, const void *input_item)
 
 const void *allocation_set_get_item_from_list(const AllocationSet *set, const AllocationList *list, const void *item)
 {
-  AllocationListItem *ll_item = list->first;
+  AllocationListItem *al_item = list->first;
 
-  while (ll_item && ll_item->item)
+  while (al_item && al_item->item)
   {
-    long items_differ = set->compare_items(ll_item->item, item);
+    long items_differ = set->compare_items(al_item->item, item);
 
     if (!items_differ)
     {
-      return ll_item->item;
+      return al_item->item;
     }
 
-    ll_item = ll_item->next;
+    al_item = al_item->next;
   }
 
   return NULL;
@@ -53,20 +53,20 @@ bool allocation_set_add(AllocationSet *set, const void *item)
 
   unsigned long hash_key = set->hash(item) % set->n_slots;
 
-  AllocationList *ll = set->set[hash_key];
+  AllocationList *al = set->set[hash_key];
 
-  if (!ll)
+  if (!al)
   {
     set->set[hash_key] = new_allocation_list();
-    ll = set->set[hash_key];
+    al = set->set[hash_key];
   }
 
-  if (allocation_set_get_item_from_list(set, ll, item))
+  if (allocation_set_get_item_from_list(set, al, item))
   {
     return false;
   }
 
-  ll->append(ll, item, item);
+  al->append(al, item);
 
   set->size++;
 
@@ -82,23 +82,41 @@ bool allocation_set_remove(AllocationSet *set, const void *item)
 
   unsigned long hash_key = set->hash(item) % set->n_slots;
 
-  AllocationList *ll = set->set[hash_key];
+  AllocationList *al = set->set[hash_key];
 
-  if (!ll)
+  if (!al)
   {
     return false;
   }
 
-  unsigned int removed = ll->remove(ll, item);
+  unsigned int removed = al->remove(al, item);
 
   if (!removed)
   {
     return false;
   }
 
+  if (al->size == 0)
+  {
+    delete_allocation_list(al);
+    set->set[hash_key] = NULL;
+  }
+
   set->size--;
 
   return true;
+}
+
+void clear_allocation_set(AllocationSet *set)
+{
+  for (unsigned int i = 0; i < set->n_slots; i++)
+  {
+    AllocationList *al = set->set[i];
+
+    delete_allocation_list(al);
+
+    set->set[i] = NULL;
+  }
 }
 
 void delete_allocation_set(AllocationSet *set)
@@ -108,12 +126,7 @@ void delete_allocation_set(AllocationSet *set)
     return;
   }
 
-  for (unsigned int i = 0; i < set->n_slots; i++)
-  {
-    AllocationList *ll = set->set[i];
-
-    delete_allocation_list(ll);
-  }
+  clear_allocation_set(set);
 
   free(set->set);
   free(set);
@@ -128,18 +141,18 @@ void allocation_set_foreach(AllocationSet *set, void (*callback)(const void *ite
 
   for (unsigned int i = 0; i < set->n_slots; i++)
   {
-    AllocationList *ll = set->set[i];
+    AllocationList *al = set->set[i];
 
-    if (ll == NULL)
+    if (al == NULL)
       continue;
 
-    AllocationListItem *ll_item = ll->first;
+    AllocationListItem *al_item = al->first;
 
-    while (ll_item)
+    while (al_item)
     {
-      callback(ll_item->item);
+      callback(al_item->item);
 
-      ll_item = ll_item->next;
+      al_item = al_item->next;
     }
   }
 }
@@ -156,6 +169,7 @@ AllocationSet *new_allocation_set()
 
   as->add = allocation_set_add;
   as->remove = allocation_set_remove;
+  as->clear = clear_allocation_set;
   as->foreach = allocation_set_foreach;
 
   return as;
