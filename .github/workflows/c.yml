@@ -13,7 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: get cunit
+    - name: apt update
+      run: sudo apt-get update
+    - name: get cunit and valgrind
       run: sudo apt-get install -y libcunit1 libcunit1-doc libcunit1-dev valgrind
     - name: make
       run: make
