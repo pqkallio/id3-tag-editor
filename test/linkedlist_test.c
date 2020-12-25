@@ -71,31 +71,26 @@ void test_remove_from_linkedlist()
     CU_ASSERT_EQUAL(ll->size, 4);
     CU_ASSERT_PTR_EQUAL(ll->first->next->item, &tfs[1]);
 
-    ll->remove(ll, b);
-
+    CU_ASSERT_PTR_EQUAL(ll->remove(ll, b), &tfs[1]);
     CU_ASSERT_EQUAL(ll->size, 3);
     CU_ASSERT_PTR_EQUAL(ll->first->next->item, &tfs[2]);
 
-    ll->remove(ll, e);
-
+    CU_ASSERT_PTR_NULL(ll->remove(ll, e));
     CU_ASSERT_EQUAL(ll->size, 3);
 
-    ll->remove(ll, a);
-
+    CU_ASSERT_PTR_EQUAL(ll->remove(ll, a), &tfs[0]);
     CU_ASSERT_EQUAL(ll->size, 2);
     CU_ASSERT_PTR_EQUAL(ll->first->item, &tfs[2]);
     CU_ASSERT_PTR_EQUAL(ll->first->next->item, &tfs[3]);
     CU_ASSERT_PTR_EQUAL(ll->last->item, &tfs[3]);
 
-    ll->remove(ll, d);
-
+    CU_ASSERT_PTR_EQUAL(ll->remove(ll, d), &tfs[3]);
     CU_ASSERT_EQUAL(ll->size, 1);
     CU_ASSERT_PTR_EQUAL(ll->first->item, &tfs[2]);
     CU_ASSERT_PTR_NULL(ll->first->next);
     CU_ASSERT_PTR_NULL(ll->first->prev);
 
-    ll->remove(ll, c);
-
+    CU_ASSERT_PTR_EQUAL(ll->remove(ll, c), &tfs[2]);
     CU_ASSERT_EQUAL(ll->size, 0);
     CU_ASSERT_PTR_NULL(ll->first);
     CU_ASSERT_PTR_NULL(ll->last);

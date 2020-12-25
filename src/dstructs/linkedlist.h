@@ -1,7 +1,6 @@
 #ifndef _DSTRUCTS_LINKEDLIST_H
 #define _DSTRUCTS_LINKEDLIST_H
 
-#include <stdbool.h>
 #include "../mem/mem.h"
 
 typedef struct _linked_list_item
@@ -23,7 +22,7 @@ typedef struct _linked_list
     struct _linked_list_item *last;
 
     void (*append)(struct _linked_list *list, const char *key, const void *item);
-    bool (*remove)(struct _linked_list *list, const char *key);
+    const void *(*remove)(struct _linked_list *list, const char *key);
 } LinkedList;
 
 LinkedList *new_linked_list(const MemMap *memmap);

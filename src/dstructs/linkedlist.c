@@ -16,15 +16,18 @@ LinkedListItem *new_linked_list_item(const MemMap *memmap, const char *key, cons
     return ll_item;
 }
 
-void delete_linked_list_item(LinkedListItem *item)
+const void *delete_linked_list_item(LinkedListItem *item)
 {
     if (!item)
-        return;
+        return NULL;
 
     const MemMap *mem = item->memmap;
+    const void *value = item->item;
 
     mem->free(mem, item->key);
     mem->free(mem, item);
+
+    return value;
 }
 
 void linked_list_append(LinkedList *list, const char *key, const void *item)
@@ -57,11 +60,11 @@ void linked_list_append(LinkedList *list, const char *key, const void *item)
     ll_item = list->first;
 }
 
-bool linked_list_remove(LinkedList *list, const char *key)
+const void *linked_list_remove(LinkedList *list, const char *key)
 {
     if (!list)
     {
-        return false;
+        return NULL;
     }
 
     LinkedListItem *ll_item = list->first;
@@ -96,12 +99,10 @@ bool linked_list_remove(LinkedList *list, const char *key)
             list->last = ll_item->prev;
         }
 
-        delete_linked_list_item(ll_item);
-
-        return true;
+        return delete_linked_list_item(ll_item);
     }
 
-    return false;
+    return NULL;
 }
 
 LinkedList *new_linked_list(const MemMap *memmap)

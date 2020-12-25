@@ -9,31 +9,26 @@ void test_get_set_and_remove(HashMap *map)
     char *b = "b";
     char *c = "c";
 
-    hashmap_set(map, a, a);
+    map->set(map, a, a);
 
     CU_ASSERT_EQUAL(map->size, 1);
-    const void *x = hashmap_get(map, a);
+    CU_ASSERT_PTR_EQUAL(map->get(map, a), a);
 
-    CU_ASSERT_PTR_EQUAL(x, a);
-
-    hashmap_set(map, b, b);
+    CU_ASSERT(map->set(map, b, b));
+    CU_ASSERT(!map->set(map, b, a));
 
     CU_ASSERT_EQUAL(map->size, 2);
-    x = hashmap_get(map, a);
-    CU_ASSERT_PTR_EQUAL(x, a);
-    x = hashmap_get(map, b);
-    CU_ASSERT_PTR_EQUAL(x, b);
+    CU_ASSERT_PTR_EQUAL(map->get(map, a), a);
+    CU_ASSERT_PTR_EQUAL(map->get(map, b), b);
 
-    x = hashmap_get(map, c);
-    CU_ASSERT_PTR_NULL(x);
+    CU_ASSERT_PTR_NULL(map->get(map, c));
 
-    hashmap_remove(map, a);
+    CU_ASSERT_PTR_EQUAL(map->remove(map, a), &a);
+    CU_ASSERT_PTR_NULL(map->remove(map, a));
 
     CU_ASSERT_EQUAL(map->size, 1);
-    x = hashmap_get(map, a);
-    CU_ASSERT_PTR_NULL(x);
-    x = hashmap_get(map, b);
-    CU_ASSERT_PTR_EQUAL(x, b);
+    CU_ASSERT_PTR_NULL(map->get(map, a));
+    CU_ASSERT_PTR_EQUAL(map->get(map, b), b);
 }
 
 void test_hashmap()
@@ -65,16 +60,16 @@ void test_hashmap_funcs_with_null_pointers()
     HashMap *map = new_hashmap(&DEFAULT_MEMMAP);
     void *value = (void *)-1;
 
-    hashmap_remove(NULL, "key");
-    hashmap_remove(map, NULL);
-    hashmap_remove(map, "key");
+    CU_ASSERT_PTR_NULL(map->remove(NULL, "key"));
+    CU_ASSERT_PTR_NULL(map->remove(map, NULL));
+    CU_ASSERT_PTR_NULL(map->remove(map, "key"));
 
-    hashmap_get(NULL, "key");
-    hashmap_get(map, NULL);
+    CU_ASSERT_PTR_NULL(map->get(NULL, "key"));
+    CU_ASSERT_PTR_NULL(map->get(map, NULL));
 
-    hashmap_set(NULL, "key", value);
-    hashmap_set(map, NULL, value);
-    hashmap_set(map, "key", NULL);
+    CU_ASSERT(!map->set(NULL, "key", value));
+    CU_ASSERT(!map->set(map, NULL, value));
+    CU_ASSERT(!map->set(map, "key", NULL));
 
     delete_hashmap(NULL);
     delete_hashmap(map);
@@ -100,10 +95,10 @@ void test_hashmap_foreach()
     int three = 3;
     int four = 4;
 
-    hashmap_set(map, "one", &one);
-    hashmap_set(map, "two", &two);
-    hashmap_set(map, "three", &three);
-    hashmap_set(map, "four", &four);
+    CU_ASSERT_FATAL(map->set(map, "one", &one));
+    CU_ASSERT_FATAL(map->set(map, "two", &two));
+    CU_ASSERT_FATAL(map->set(map, "three", &three));
+    CU_ASSERT_FATAL(map->set(map, "four", &four));
 
     for (j = 0; j < 4; j++)
     {
@@ -115,7 +110,7 @@ void test_hashmap_foreach()
         CU_ASSERT_EQUAL_FATAL(handled[j], 0);
     }
 
-    hashmap_foreach(map, mock_callback);
+    map->foreach (map, mock_callback);
 
     for (i = 0; i < 4; i++)
     {
@@ -144,8 +139,8 @@ void test_hashmap_foreach()
         CU_ASSERT_EQUAL_FATAL(handled[j], 1);
     }
 
-    hashmap_foreach(NULL, mock_callback);
-    hashmap_foreach(map, NULL);
+    map->foreach (NULL, mock_callback);
+    map->foreach (map, NULL);
 
     delete_hashmap(map);
 }

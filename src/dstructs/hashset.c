@@ -109,7 +109,7 @@ HSError hashset_remove(HashSet *set, const void *item)
     return HSE_NOT_FOUND;
   }
 
-  unsigned int removed = ll->remove(ll, item);
+  const void *removed = ll->remove(ll, item);
 
   if (!removed)
   {

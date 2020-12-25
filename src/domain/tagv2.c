@@ -23,7 +23,7 @@ void add_tag_v2_frame(
     new_frame->header.flags[1] = flags[1];
     new_frame->header.has_zero_byte = has_zero_byte;
 
-    hashmap_set(tag->frames, id, new_frame);
+    tag->frames->set(tag->frames, id, new_frame);
 }
 
 TagV2 *new_tag_v2(const MemMap *memmap, uint16_t version, unsigned char flags, uint32_t size)
@@ -68,7 +68,8 @@ void delete_tag_v2(TagV2 *tag)
         return;
     }
 
-    hashmap_foreach(tag->frames, delete_tag_v2_frame_from_map);
+    tag->frames->foreach (tag->frames, delete_tag_v2_frame_from_map);
+    tag->frames->clear(tag->frames);
     delete_hashmap(tag->frames);
 
     tag->memmap->free(tag->memmap, tag);
@@ -81,5 +82,5 @@ const TagV2Frame *get_tag_v2_frame(const TagV2 *tagV2, const char *frame_id)
         return NULL;
     }
 
-    return hashmap_get(tagV2->frames, frame_id);
+    return tagV2->frames->get(tagV2->frames, frame_id);
 }
