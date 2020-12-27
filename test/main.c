@@ -9,6 +9,7 @@
 #include "strings_test.h"
 #include "mem_test.h"
 #include "hashset_test.h"
+#include "unique_id_test.h"
 
 CU_SuiteInfo create_test_suite(char *name, CU_TestInfo *tests)
 {
@@ -36,8 +37,19 @@ int main()
 
     CU_TestInfo util_strings_tests[] = {
         {"string_copy(char* str)", test_string_copy},
+        {"char_to_hex(char* dst, uint8_t val)", test_char_to_hex},
         CU_TEST_INFO_NULL,
     };
+
+    CU_TestInfo util_unique_id_tests[] = {
+        {"0 length", test_unique_id_with_length_0},
+        {"2 length", test_unique_id_with_length_2},
+        {"4 length", test_unique_id_with_length_4},
+        {"5 length", test_unique_id_with_length_5},
+        {"6 length", test_unique_id_with_length_6},
+        {"32 length", test_unique_id_with_length_32},
+        {"254 length", test_unique_id_with_length_254},
+        CU_TEST_INFO_NULL};
 
     CU_TestInfo parser_tests[] = {
         {"ID3 v2 tag", test_id3v2_parser},
@@ -74,6 +86,7 @@ int main()
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
         create_test_suite("util/strings.c", util_strings_tests),
+        create_test_suite("util/unique_id.c", util_unique_id_tests),
         create_test_suite("parser/parser.c", parser_tests),
         create_test_suite("dstructs/stack.c", stack_tests),
         create_test_suite("dstructs/linkedlist.c", linkedlist_tests),
