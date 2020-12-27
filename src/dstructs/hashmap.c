@@ -48,9 +48,16 @@ const void *hashmap_get(HashMap *map, const char *key)
 
     while (ll_item)
     {
-        if (ll_item->item && !strcmp(key, ll_item->key))
+        if (!ll_item->item)
         {
-            return ll_item->item;
+            continue;
+        }
+
+        HashMapEntry *entry = (HashMapEntry *)ll_item->item;
+
+        if (!strcmp(key, entry->key))
+        {
+            return entry->item;
         }
 
         ll_item = ll_item->next;
@@ -81,11 +88,23 @@ bool hashmap_set(HashMap *map, const char *key, const void *value)
         ll = map->map[hash_key];
     }
 
-    ll->append(ll, key, value);
+    HashMapEntry *entry = map->memmap->allocate(map->memmap, 1, sizeof(HashMapEntry));
+    entry->key = string_copy(map->memmap, key);
+    entry->item = value;
+
+    ll->append(ll, entry);
 
     map->size++;
 
     return true;
+}
+
+int hashmap_entry_comparator(const LinkedListItem *ll_item, const void *item)
+{
+    HashMapEntry *entry = (HashMapEntry *)(ll_item->item);
+    const char *key = (const char *)item;
+
+    return strcmp(entry->key, key);
 }
 
 const void *hashmap_remove(HashMap *map, const char *key)
@@ -104,7 +123,8 @@ const void *hashmap_remove(HashMap *map, const char *key)
         return NULL;
     }
 
-    const void *item = ll->remove(ll, key);
+    LinkedListItem *ll_item = (LinkedListItem *)ll->find(ll, key, hashmap_entry_comparator);
+    const void *item = ll->remove(ll, ll_item);
 
     if (item)
         map->size--;

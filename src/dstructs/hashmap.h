@@ -4,6 +4,13 @@
 #include <stdbool.h>
 #include "linkedlist.h"
 #include "../mem/mem.h"
+#include "../util/strings.h"
+
+typedef struct __hashmap_entry
+{
+  char *key;
+  const void *item;
+} HashMapEntry;
 
 typedef struct _hashmap
 {

@@ -22,11 +22,23 @@ void test_id3v2_parser()
 
   write_data_to_test_file_and_rewind(id3_v2_tag_mock, 6240);
 
+  const char *expected_ids[10] = {
+      "510FB07ECADF79C34108BD62A245AB11",
+      "7F306CEA84844A30B1B390B8A165CBF2",
+      "747CF0BEDB6A831E73C0009506ABA785",
+      "DC93EFE0193A904A6EA0038F064F82FA",
+      "4BF2B928DCBC4650FCC56603718D09CD",
+      "21F82EB9B3BE0422DE87B1E556B360A1",
+      "A699C983D68F54D3553AD747C7E09468",
+      "59C3230D02A6AEE1AD6047049327A6B9",
+      "C0EFBD9700916CD4CBC39B932431FB7D",
+      "F49E0B76C5B9D7739A1FF7AD461E6808"};
+
   TagV2 *actual = parseMP3(&DEFAULT_MEMMAP, fp);
 
   CU_ASSERT_EQUAL(actual->frames->size, 10);
 
-  const TagV2Frame *frame = get_tag_v2_frame(actual, "TALB");
+  const TagV2Frame *frame = get_tag_v2_frame(actual, "510FB07ECADF79C34108BD62A245AB11");
   CU_ASSERT_PTR_NOT_NULL_FATAL(frame);
 
   const TagV2FrameHeader *header = &frame->header;

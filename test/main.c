@@ -1,5 +1,6 @@
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
+#include <stdlib.h>
 #include "binary_test.h"
 #include "parser_test.h"
 #include "linkedlist_test.h"
@@ -18,6 +19,8 @@ CU_SuiteInfo create_test_suite(char *name, CU_TestInfo *tests)
 
 int main()
 {
+    srand(42);
+
     CU_ErrorCode err = CU_initialize_registry();
 
     if (err != CUE_SUCCESS)

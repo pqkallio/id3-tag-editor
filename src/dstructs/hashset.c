@@ -86,7 +86,7 @@ HSError hashset_add(HashSet *set, const void *item)
     return HSE_ALREADY_EXISTS;
   }
 
-  ll->append(ll, item, item);
+  ll->append(ll, item);
 
   set->size++;
 

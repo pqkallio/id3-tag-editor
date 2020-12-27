@@ -25,6 +25,7 @@ typedef struct _tag_v2_frame_header
 
 typedef struct _tag_v2_frame
 {
+    char unique_id[33];
     const MemMap *memmap;
     TagV2FrameHeader header;
     char *body;
