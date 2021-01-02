@@ -28,3 +28,25 @@ void test_memmap_allocate()
   delete_memmap(NULL);
   delete_memmap(mem);
 }
+
+void test_very_many_allocations()
+{
+  void *allocations[10000] = {NULL};
+
+  MemMap *mem = new_memmap();
+
+  for (int i = 0; i < 10000; i++)
+  {
+    void *allocation = mem->allocate(mem, 1, 8);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(allocation);
+    allocations[i] = allocation;
+  }
+
+  for (int i = 0; i < 5000; i++)
+  {
+    MemError err = mem->free(mem, allocations[i]);
+    CU_ASSERT_EQUAL_FATAL(err, MEME_SUCCESS);
+  }
+
+  delete_memmap(mem);
+}

@@ -86,7 +86,7 @@ HSError hashset_add(HashSet *set, const void *item)
     return HSE_ALREADY_EXISTS;
   }
 
-  ll->append(ll, item, item);
+  ll->append(ll, item);
 
   set->size++;
 
@@ -109,7 +109,8 @@ HSError hashset_remove(HashSet *set, const void *item)
     return HSE_NOT_FOUND;
   }
 
-  unsigned int removed = ll->remove(ll, item);
+  const LinkedListItem *lli = ll->find(ll, item, NULL);
+  const void *removed = ll->remove(ll, (LinkedListItem *)lli);
 
   if (!removed)
   {

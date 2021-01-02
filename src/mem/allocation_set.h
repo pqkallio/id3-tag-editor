@@ -29,7 +29,6 @@ typedef struct _allocation_set
   bool (*add)(struct _allocation_set *set, const void *item);
   bool (*remove)(struct _allocation_set *set, const void *item);
   void (*clear)(struct _allocation_set *set);
-  void (*foreach)(struct _allocation_set *set, void (*callback)(const void *item));
 
   AllocationList **set;
 } AllocationSet;

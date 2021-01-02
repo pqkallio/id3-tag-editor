@@ -117,6 +117,8 @@ void clear_allocation_set(AllocationSet *set)
 
     set->set[i] = NULL;
   }
+
+  set->size = 0;
 }
 
 void delete_allocation_set(AllocationSet *set)
@@ -132,31 +134,6 @@ void delete_allocation_set(AllocationSet *set)
   free(set);
 }
 
-void allocation_set_foreach(AllocationSet *set, void (*callback)(const void *item))
-{
-  if (!set || !callback)
-  {
-    return;
-  }
-
-  for (unsigned int i = 0; i < set->n_slots; i++)
-  {
-    AllocationList *al = set->set[i];
-
-    if (al == NULL)
-      continue;
-
-    AllocationListItem *al_item = al->first;
-
-    while (al_item)
-    {
-      callback(al_item->item);
-
-      al_item = al_item->next;
-    }
-  }
-}
-
 AllocationSet *new_allocation_set()
 {
   AllocationSet *as = calloc(1, sizeof(AllocationSet));
@@ -170,7 +147,6 @@ AllocationSet *new_allocation_set()
   as->add = allocation_set_add;
   as->remove = allocation_set_remove;
   as->clear = clear_allocation_set;
-  as->foreach = allocation_set_foreach;
 
   return as;
 }

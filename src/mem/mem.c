@@ -4,11 +4,6 @@ extern void *default_alloc(const MemMap *map, size_t num_items, size_t item_size
 
 extern MemError default_free(const MemMap *map, const void *item);
 
-void free_allocation(const void *entry)
-{
-    free((void *)entry);
-}
-
 void *memmap_allocate(const MemMap *map, size_t num_items, size_t item_size)
 {
     if (!map)

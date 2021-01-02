@@ -3,7 +3,33 @@
 #include "hashmap.h"
 #include "../util/hash.h"
 
-const void *hashmap_get(const HashMap *map, const char *key)
+void hashmap_foreach(HashMap *map, void (*callback)(const void *item))
+{
+    if (!map || !callback)
+    {
+        return;
+    }
+
+    for (unsigned int i = 0; i < map->n_slots; i++)
+    {
+        LinkedList *ll = map->map[i];
+
+        if (ll == NULL)
+            continue;
+
+        LinkedListItem *ll_item = ll->first;
+
+        while (ll_item)
+        {
+            const HashMapEntry *entry = (const HashMapEntry *)ll_item->item;
+            callback(entry->item);
+
+            ll_item = ll_item->next;
+        }
+    }
+}
+
+const void *hashmap_get(HashMap *map, const char *key)
 {
     if (!map || !key)
     {
@@ -23,9 +49,16 @@ const void *hashmap_get(const HashMap *map, const char *key)
 
     while (ll_item)
     {
-        if (ll_item->item && !strcmp(key, ll_item->key))
+        if (!ll_item->item)
         {
-            return ll_item->item;
+            continue;
+        }
+
+        HashMapEntry *entry = (HashMapEntry *)ll_item->item;
+
+        if (!strcmp(key, entry->key))
+        {
+            return entry->item;
         }
 
         ll_item = ll_item->next;
@@ -34,11 +67,16 @@ const void *hashmap_get(const HashMap *map, const char *key)
     return NULL;
 }
 
-void hashmap_set(HashMap *map, const char *key, const void *value)
+bool hashmap_set(HashMap *map, const char *key, const void *value)
 {
     if (!map || !key || !value)
     {
-        return;
+        return false;
+    }
+
+    if (map->get(map, key) != NULL)
+    {
+        return false;
     }
 
     unsigned long hash_key = hash(key) % map->n_slots;
@@ -51,16 +89,42 @@ void hashmap_set(HashMap *map, const char *key, const void *value)
         ll = map->map[hash_key];
     }
 
-    ll->append(ll, key, value);
+    HashMapEntry *entry = map->memmap->allocate(map->memmap, 1, sizeof(HashMapEntry));
+    entry->key = string_copy(map->memmap, key);
+    entry->item = value;
+
+    ll->append(ll, entry);
 
     map->size++;
+
+    return true;
 }
 
-void hashmap_remove(HashMap *map, const char *key)
+int hashmap_entry_comparator(const LinkedListItem *ll_item, const void *item)
+{
+    HashMapEntry *entry = (HashMapEntry *)(ll_item->item);
+    const char *key = (const char *)item;
+
+    return strcmp(entry->key, key);
+}
+
+void delete_hashmap_entry(HashMap *map, HashMapEntry *entry)
+{
+    if (!map || !entry || !map->memmap)
+        return;
+
+    MemMap *mem = map->memmap;
+
+    // TODO: handle errors
+    mem->free(mem, entry->key);
+    mem->free(mem, entry);
+}
+
+const void *hashmap_remove(HashMap *map, const char *key)
 {
     if (!map || !key)
     {
-        return;
+        return NULL;
     }
 
     unsigned long hash_key = hash(key) % map->n_slots;
@@ -69,11 +133,52 @@ void hashmap_remove(HashMap *map, const char *key)
 
     if (!ll)
     {
-        return;
+        return NULL;
     }
 
-    if (ll->remove(ll, key))
-        map->size--;
+    LinkedListItem *ll_item = (LinkedListItem *)ll->find(ll, key, hashmap_entry_comparator);
+    const void *item = ll->remove(ll, ll_item);
+
+    if (!item)
+        return NULL;
+
+    map->size--;
+
+    const HashMapEntry *entry = (HashMapEntry *)item;
+    const void *ret_val = entry->item;
+
+    delete_hashmap_entry(map, entry);
+
+    return ret_val;
+}
+
+void hashmap_clear(HashMap *map)
+{
+    for (unsigned int i = 0; i < map->n_slots; i++)
+    {
+        LinkedList *ll = map->map[i];
+
+        if (!ll)
+        {
+            continue;
+        }
+
+        LinkedListItem *ll_item = ll->first;
+
+        while (ll_item != NULL)
+        {
+            HashMapEntry *entry = (HashMapEntry *)ll_item->item;
+            delete_hashmap_entry(map, entry);
+
+            ll_item = ll_item->next;
+        }
+
+        delete_linked_list(ll);
+
+        map->map[i] = NULL;
+    }
+
+    map->size = 0;
 }
 
 HashMap *new_hashmap_with_size(const MemMap *memmap, unsigned long size)
@@ -84,6 +189,12 @@ HashMap *new_hashmap_with_size(const MemMap *memmap, unsigned long size)
     map->memmap = mem;
     map->n_slots = size;
     map->map = mem->allocate(mem, map->n_slots, sizeof(LinkedList *));
+
+    map->foreach = hashmap_foreach;
+    map->get = hashmap_get;
+    map->remove = hashmap_remove;
+    map->set = hashmap_set;
+    map->clear = hashmap_clear;
 
     return map;
 }
@@ -100,40 +211,10 @@ void delete_hashmap(HashMap *map)
         return;
     }
 
-    for (unsigned int i = 0; i < map->n_slots; i++)
-    {
-        LinkedList *ll = map->map[i];
-
-        delete_linked_list(ll);
-    }
+    hashmap_clear(map);
 
     const MemMap *mem = map->memmap;
 
     mem->free(mem, map->map);
     mem->free(mem, map);
-}
-
-void hashmap_foreach(HashMap *map, void (*callback)(const void *item))
-{
-    if (!map || !callback)
-    {
-        return;
-    }
-
-    for (unsigned int i = 0; i < map->n_slots; i++)
-    {
-        LinkedList *ll = map->map[i];
-
-        if (ll == NULL)
-            continue;
-
-        LinkedListItem *ll_item = ll->first;
-
-        while (ll_item)
-        {
-            callback(ll_item->item);
-
-            ll_item = ll_item->next;
-        }
-    }
 }
