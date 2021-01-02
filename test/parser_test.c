@@ -109,3 +109,75 @@ void test_id3v2_parser()
 
   delete_tag_v2(actual);
 }
+
+void test_with_invalid_files()
+{
+  fp = open_test_file_in_read_write_mode();
+
+  if (!fp)
+  {
+    return;
+  }
+
+  unsigned char mock[6240] = {0};
+  memcpy(mock, id3_v2_tag_mock, 6240);
+  mock[2] = 0x34;
+
+  write_data_to_test_file_and_rewind(mock, 6240);
+
+  CU_ASSERT_PTR_NULL(parseMP3(&DEFAULT_MEMMAP, fp));
+
+  CU_ASSERT_PTR_NULL(parseMP3(&DEFAULT_MEMMAP, NULL));
+
+  close_and_remove_test_file();
+
+  fp = open_test_file_in_read_write_mode();
+
+  if (!fp)
+  {
+    return;
+  }
+
+  unsigned char mock2[3] = {0x49, 0x44, 0x33};
+
+  write_data_to_test_file_and_rewind(mock2, 3);
+
+  CU_ASSERT_PTR_NULL(parseMP3(&DEFAULT_MEMMAP, fp));
+
+  close_and_remove_test_file();
+
+  fp = open_test_file_in_read_write_mode();
+
+  if (!fp)
+  {
+    return;
+  }
+
+  unsigned char mock3[2] = {0x49, 0x44};
+
+  write_data_to_test_file_and_rewind(mock3, 2);
+
+  CU_ASSERT_PTR_NULL(parseMP3(&DEFAULT_MEMMAP, fp));
+
+  close_and_remove_test_file();
+
+  fp = open_test_file_in_read_write_mode();
+
+  if (!fp)
+  {
+    return;
+  }
+
+  unsigned char mock4[300] = {0};
+  memcpy(mock4, id3_v2_tag_mock, 300);
+
+  write_data_to_test_file_and_rewind(mock4, 300);
+
+  TagV2 *actual = parseMP3(&DEFAULT_MEMMAP, fp);
+
+  CU_ASSERT_EQUAL(actual->frames->size, 2);
+
+  close_and_remove_test_file();
+
+  delete_tag_v2(actual);
+}

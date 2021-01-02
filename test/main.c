@@ -48,10 +48,12 @@ int main()
         {"6 length", test_unique_id_with_length_6},
         {"32 length", test_unique_id_with_length_32},
         {"254 length", test_unique_id_with_length_254},
-        CU_TEST_INFO_NULL};
+        CU_TEST_INFO_NULL,
+    };
 
     CU_TestInfo parser_tests[] = {
         {"ID3 v2 tag", test_id3v2_parser},
+        {"Invalid files", test_with_invalid_files},
         CU_TEST_INFO_NULL,
     };
 
@@ -60,27 +62,34 @@ int main()
         {"Append to list", test_append_to_linkedlist},
         {"Remove from list", test_remove_from_linkedlist},
         {"Delete a null list", test_linkedlist_is_null},
-        CU_TEST_INFO_NULL};
+        CU_TEST_INFO_NULL,
+    };
 
     CU_TestInfo hashmap_tests[] = {
         {"HashMap with default size", test_hashmap},
         {"HashMap with size 42", test_hashmap_with_size},
         {"HashMap tests with null pointers", test_hashmap_funcs_with_null_pointers},
         {"HashMap foreach", test_hashmap_foreach},
-        CU_TEST_INFO_NULL};
+        CU_TEST_INFO_NULL,
+    };
 
     CU_TestInfo hashset_tests[] = {
         {"HashSet with default size", test_hashset},
         {"HashSet with size 42", test_hashset_with_size},
         {"HashSet tests with null pointers", test_hashset_funcs_with_null_pointers},
-        CU_TEST_INFO_NULL};
+        CU_TEST_INFO_NULL,
+    };
 
     CU_TestInfo stack_tests[] = {
         {"Stack test", test_stack},
-        CU_TEST_INFO_NULL};
+        CU_TEST_INFO_NULL,
+    };
 
     CU_TestInfo mem_tests[] = {
-        {"MemMap allocation test", test_memmap_allocate}};
+        {"MemMap allocation test", test_memmap_allocate},
+        {"Very many allocations", test_very_many_allocations},
+        CU_TEST_INFO_NULL,
+    };
 
     CU_SuiteInfo suites[] = {
         create_test_suite("util/binary.c", util_binary_tests),
