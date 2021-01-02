@@ -109,7 +109,8 @@ HSError hashset_remove(HashSet *set, const void *item)
     return HSE_NOT_FOUND;
   }
 
-  const void *removed = ll->remove(ll, item);
+  const LinkedListItem *lli = ll->find(ll, item, NULL);
+  const void *removed = ll->remove(ll, (LinkedListItem *)lli);
 
   if (!removed)
   {

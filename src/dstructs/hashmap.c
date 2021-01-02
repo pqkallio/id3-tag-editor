@@ -21,7 +21,8 @@ void hashmap_foreach(HashMap *map, void (*callback)(const void *item))
 
         while (ll_item)
         {
-            callback(ll_item->item);
+            const HashMapEntry *entry = (const HashMapEntry *)ll_item->item;
+            callback(entry->item);
 
             ll_item = ll_item->next;
         }
@@ -107,6 +108,18 @@ int hashmap_entry_comparator(const LinkedListItem *ll_item, const void *item)
     return strcmp(entry->key, key);
 }
 
+void delete_hashmap_entry(HashMap *map, HashMapEntry *entry)
+{
+    if (!map || !entry || !map->memmap)
+        return;
+
+    MemMap *mem = map->memmap;
+
+    // TODO: handle errors
+    mem->free(mem, entry->key);
+    mem->free(mem, entry);
+}
+
 const void *hashmap_remove(HashMap *map, const char *key)
 {
     if (!map || !key)
@@ -126,10 +139,17 @@ const void *hashmap_remove(HashMap *map, const char *key)
     LinkedListItem *ll_item = (LinkedListItem *)ll->find(ll, key, hashmap_entry_comparator);
     const void *item = ll->remove(ll, ll_item);
 
-    if (item)
-        map->size--;
+    if (!item)
+        return NULL;
 
-    return item;
+    map->size--;
+
+    const HashMapEntry *entry = (HashMapEntry *)item;
+    const void *ret_val = entry->item;
+
+    delete_hashmap_entry(map, entry);
+
+    return ret_val;
 }
 
 void hashmap_clear(HashMap *map)
@@ -137,6 +157,21 @@ void hashmap_clear(HashMap *map)
     for (unsigned int i = 0; i < map->n_slots; i++)
     {
         LinkedList *ll = map->map[i];
+
+        if (!ll)
+        {
+            continue;
+        }
+
+        LinkedListItem *ll_item = ll->first;
+
+        while (ll_item != NULL)
+        {
+            HashMapEntry *entry = (HashMapEntry *)ll_item->item;
+            delete_hashmap_entry(map, entry);
+
+            ll_item = ll_item->next;
+        }
 
         delete_linked_list(ll);
 
@@ -176,12 +211,7 @@ void delete_hashmap(HashMap *map)
         return;
     }
 
-    for (unsigned int i = 0; i < map->n_slots; i++)
-    {
-        LinkedList *ll = map->map[i];
-
-        delete_linked_list(ll);
-    }
+    hashmap_clear(map);
 
     const MemMap *mem = map->memmap;
 

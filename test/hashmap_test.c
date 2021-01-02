@@ -23,7 +23,7 @@ void test_get_set_and_remove(HashMap *map)
 
     CU_ASSERT_PTR_NULL(map->get(map, c));
 
-    CU_ASSERT_PTR_EQUAL(map->remove(map, a), &a);
+    CU_ASSERT_PTR_EQUAL(map->remove(map, a), a);
     CU_ASSERT_PTR_NULL(map->remove(map, a));
 
     CU_ASSERT_EQUAL(map->size, 1);

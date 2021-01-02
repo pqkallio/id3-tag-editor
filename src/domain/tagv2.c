@@ -17,7 +17,7 @@ void add_tag_v2_frame(
 
     new_frame->memmap = memmap;
     generate_unique_id(new_frame->unique_id, 32);
-    new_frame->unique_id[32] = NULL;
+    new_frame->unique_id[32] = '\0';
     new_frame->header.id = string_copy(memmap, id);
     new_frame->body = string_copy(memmap, body);
 

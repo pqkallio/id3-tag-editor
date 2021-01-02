@@ -20,7 +20,6 @@ CU_SuiteInfo create_test_suite(char *name, CU_TestInfo *tests)
 
 int main()
 {
-    srand(42);
 
     CU_ErrorCode err = CU_initialize_registry();
 
