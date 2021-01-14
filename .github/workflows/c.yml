@@ -2,26 +2,25 @@ name: C CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: apt update
-      run: sudo apt-get update
-    - name: get cunit and valgrind
-      run: sudo apt-get install -y libcunit1 libcunit1-doc libcunit1-dev valgrind
-    - name: make
-      run: make
-    - name: make tester
-      run: make tester
-    - name: run tester
-      run: ./tester
-    - name: valgrind
-      run: valgrind --leak-check=full ./tester
+      - uses: actions/checkout@v2
+      - name: apt update
+        run: sudo apt-get update
+      - name: get cunit and valgrind
+        run: sudo apt-get install -y libcunit1 libcunit1-doc libcunit1-dev valgrind
+      - name: make
+        run: make
+      - name: make tester
+        run: make tester
+      - name: run tester
+        run: ./tester
+      - name: valgrind tester
+        run: valgrind --leak-check=full ./tester
