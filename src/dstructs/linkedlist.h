@@ -20,12 +20,15 @@ typedef struct _linked_list
     struct _linked_list_item *first;
     struct _linked_list_item *last;
 
+    int (*sorter)(struct _linked_list_item *first, struct _linked_list_item *second);
+
     void (*append)(struct _linked_list *list, const void *item);
     const LinkedListItem *(*find)(
         struct _linked_list *list,
         const void *item,
         int (*comparator)(const LinkedListItem *ll_item, const void *comparee));
     const void *(*remove)(struct _linked_list *list, LinkedListItem *item);
+    void (*sort)(struct _linked_list *list);
 } LinkedList;
 
 LinkedList *new_linked_list(const MemMap *memmap);

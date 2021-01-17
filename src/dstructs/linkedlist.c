@@ -132,6 +132,39 @@ const LinkedListItem *linked_list_find(
     return NULL;
 }
 
+void sort(LinkedList *list)
+{
+    if (!list)
+    {
+        return;
+    }
+
+    MemMap *memmap = list->memmap;
+    unsigned long size = list->size;
+
+    LinkedListItem **items = memmap->allocate(memmap, size, sizeof(void *));
+
+    LinkedListItem *item = list->first;
+    size_t i = 0;
+
+    while (item)
+    {
+        items[i++] = item;
+        item = item->next;
+    }
+
+    // TODO: sort items
+
+    // TODO: recreate the linked list based on sorted items
+
+    memmap->free(memmap, items);
+}
+
+int default_sorter(LinkedListItem *first, LinkedListItem *second)
+{
+    return (int)first - (int)second;
+}
+
 LinkedList *new_linked_list(const MemMap *memmap)
 {
     const MemMap *mem = memmap ? memmap : &DEFAULT_MEMMAP;
@@ -142,6 +175,8 @@ LinkedList *new_linked_list(const MemMap *memmap)
     list->append = linked_list_append;
     list->remove = linked_list_remove;
     list->find = linked_list_find;
+
+    list->sorter = default_sorter;
 
     return list;
 }
